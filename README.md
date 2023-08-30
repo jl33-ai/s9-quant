@@ -1,6 +1,10 @@
 # s9-quant
 A Gruellingly Simple Terminal based Playground of Raw Quant Mental Math Exercises
 
+### Features
+- Intelligently scrapes the web for new questions and news
+- GPT wrapper for dynamic q/a's
+
 # TO-DO
 - Every question you complete gives you a QXP, with multipliers for streaks etc. 
 - It needs a... Scraper. 
