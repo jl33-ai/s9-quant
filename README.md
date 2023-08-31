@@ -1,5 +1,5 @@
 # s9-quant
-A Gruellingly Simple Terminal based Playground of Raw Quant Mental Math Exercises
+A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercises
 
 ### Features
 - Intelligently scrapes the web for new questions and news
