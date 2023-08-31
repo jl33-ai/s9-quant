@@ -7,6 +7,7 @@ A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercis
 - ASCII data visualisations
 - Basic machine learning algorithms applied to user performance data
 - Generative techniques to formulate questions sets
+- [Recusrive 24 Algorithm](https://w3.cs.jmu.edu/spragunr/CS159/pas/twenty_four/twenty_four.shtml)
 
 # TO-DO
 - Every question you complete gives you a QXP, with multipliers for streaks etc. 
@@ -17,4 +18,8 @@ A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercis
 - Main loop
 - approximation game
 -# ranking mode
-- need a json list of q's and a's under certain categories. 
+- need a json list of q's and a's under certain categories.
+- Add a timer showing how long each one takes 
+- Make it ‘grindable
+- Badges custom name thin about the mechanics 
+
