@@ -23,3 +23,24 @@ A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercis
 - Make it ‘grindable
 - Badges custom name thin about the mechanics 
 
+- Simple, more simple. 
+- full trading sim - make it addictibe, like gamvling. 
+- ℞ +/0
+- puts you in the top % of people (quantile)
+- what makes speed typing test good... it's simple. you get good scores. 
+- Use it to practice like call’s puts
+
+- Every question you complete gives you a QXP, with multipliers for streaks etc. 
+- It needs a... Scraper. 
+- 'QXP earned: ' 
+- :-( :-| :-) 𝝈 - whil eyou're playing. The sigma is multicoloured
+- Main loop
+- approximation game
+- ranking mode
+- need a json list of q's and a's under certain categories. 
+
+- Colour of sigma, rank
+- Personality type: 
+- Cookie clicker addictive
+- Stats: percentile of people, games played, 
+
