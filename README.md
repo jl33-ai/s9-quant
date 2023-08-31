@@ -42,5 +42,6 @@ A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercis
 - Colour of sigma, rank
 - Personality type: 
 - Cookie clicker addictive
-- Stats: percentile of people, games played, 
+- Stats: percentile of people, games played,
+- why mntl math?
 
