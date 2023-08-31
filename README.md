@@ -4,6 +4,9 @@ A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercis
 ### Features
 - Intelligently scrapes the web for new questions and news
 - GPT wrapper for dynamic q/a's
+- ASCII data visualisations
+- Basic machine learning algorithms applied to user performance data
+- Generative techniques to formulate questions sets
 
 # TO-DO
 - Every question you complete gives you a QXP, with multipliers for streaks etc. 
