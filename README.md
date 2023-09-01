@@ -45,3 +45,7 @@ A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercis
 - Stats: percentile of people, games played,
 - why mntl math?
 
+
+Solving algorithm: 
+- number of combinations (all 4 numbers must be used once, any of the 4 operations any number of times)
+- ⇒ $4! *  4^3$
