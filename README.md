@@ -49,3 +49,5 @@ A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercis
 Solving algorithm: 
 - number of combinations (all 4 numbers must be used once, any of the 4 operations any number of times)
 - ⇒ $4! *  4^3$
+
+[Curses Python](https://docs.python.org/3/library/curses.html)
