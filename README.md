@@ -5,6 +5,7 @@ A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercis
 - Intelligently scrapes the web for new questions and news
 - GPT wrapper for dynamic q/a's
 - ASCII data visualisations
+- Regex for input command identification
 - Basic machine learning algorithms applied to user performance data
 - Generative techniques to formulate questions sets
 - [Recusrive 24 Algorithm](https://w3.cs.jmu.edu/spragunr/CS159/pas/twenty_four/twenty_four.shtml)
