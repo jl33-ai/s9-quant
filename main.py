@@ -1,4 +1,7 @@
 # Quant-S9
+# Made by Justin Lee 
+# @jlee.ai 
+
 from curses.textpad import Textbox, rectangle
 import curses
 import json
@@ -9,6 +12,8 @@ import re
 
 #rainbow tier
 #bot v bot functionality 
+# ['┼', '┤', '╶', '╴', '─', '╰', '╭', '╮', '╯', '│']
+
 
 # Define window height and width
 h, w = 30, 81
@@ -50,15 +55,17 @@ def generate_question(difficulty):
 def add_skill_bars(stdscr):
     # Skill Level (thes ecan lash maybe)
     # Make this a function, refresh after every session. 
+    # Simply the average of 3 best scores for each one
 
-    # Zetamac bar
-    # Get the skill level from the json or something
+    # Zeta bar
+    # Get the skill level from the json or something; should be computed when this is displayed? maybe? 
+    skill_range = 17
+
+    #Zeta
     zeta_skill = 13
     stdscr.addstr(3, 40, "▓" * (zeta_skill-1), curses.color_pair(2))
     stdscr.addstr(3, 40+zeta_skill-1, "▓", curses.color_pair(2) | curses.A_BLINK)
-    stdscr.addstr(3, 40+zeta_skill, "▒" * (17-zeta_skill), curses.color_pair(2))
-
-
+    stdscr.addstr(3, 40+zeta_skill, "▒" * (skill_range-zeta_skill), curses.color_pair(2))
 
     stdscr.addstr(4, 40, "▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒", curses.color_pair(2))
     stdscr.addstr(5, 40, "▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒", curses.color_pair(2))
@@ -92,14 +99,15 @@ def draw_box(stdscr, y, x, height, width):
         stdscr.addch(y, i, curses.ACS_HLINE)
         stdscr.addch(y + height, i, curses.ACS_HLINE)
 
-def start_game(stdscr, game_time, difficulty):
+def start_zeta(stdscr, game_time, difficulty):
+    # Data science - track literally everything 
     stdscr.nodelay(True)  # set getch() non-blocking
     stdscr.addstr(5, 3, f"Starting: {game_time} seconds, difficulty {difficulty}")
     stdscr.refresh()
     #countdown(stdscr)
     time.sleep(1)
     stdscr.addstr(5, 3, "                                                       ")
-    stdscr.addstr(6, 3, "                                                       ")
+    # stdscr.addstr(5, 40, "Live", curses.color_pair(4) | curses.A_BLINK)
     stdscr.refresh()
     
     start_time = time.time()
@@ -110,6 +118,7 @@ def start_game(stdscr, game_time, difficulty):
     while time_left:
         question, correct_answer = generate_question(difficulty)
         stdscr.addstr(6, 3, f"> {question}           ")
+        stdscr.refresh()
         
         answer_str = ''
         while True:
@@ -119,7 +128,7 @@ def start_game(stdscr, game_time, difficulty):
             if elapsed_time >= game_time:
                 time_left = False
                 break  # Exit inner while loop
-
+            
             key = stdscr.getch()
             
             if key in [curses.KEY_BACKSPACE, ord('\b'), ord('\x7f')]:
@@ -138,17 +147,30 @@ def start_game(stdscr, game_time, difficulty):
             try:
                 if float(answer_str) == correct_answer:
                     score += 1
+                    stdscr.addstr(6, 45, "           ")
                     stdscr.refresh()
                     break  # Go to the next question
+
             except ValueError:  # Handle the case where answer_str cannot be converted to float
                 continue
 
     # print your final score was
+    # Standardise score: divide by time in seconds (so it's per second), and then multiply by difficulty
+    # To reward longer games
+    stnd_score = int((score / (game_time ** 0.75)) * 100)
     stdscr.addstr(5, 3, f"⏲: 0s") 
-    stdscr.addstr(6, 3, f"Program finished, score: {score}") 
+    stdscr.addstr(6, 3, f"Program finished") 
+    stdscr.addstr(7, 3, f"  Raw Score:          {score}") 
+    stdscr.addstr(8, 3, f"  Standardized Score: {stnd_score}") 
+    stdscr.addstr(10, 3, f"  Saved", curses.color_pair(4) | curses.A_BLINK) 
     stdscr.refresh()
     stdscr.nodelay(False)
     key = stdscr.getch()
+    # Save to profile, show a flashing 'saved'
+    game_event = {
+        "date_of_attempt": datetime.now().strftime('%d/%m/%Y'), 
+        "score": stnd_score,
+    }
 
 def countdown(stdscr):
     for count in reversed(range(1, 4)):
@@ -159,14 +181,11 @@ def countdown(stdscr):
     time.sleep(0.4)
     return 
 
-
-
 def draw_home(stdscr):
     # Clear Screen
     stdscr.clear()
     # Draw the square and rectangle beneath the top menu bar
     draw_box(stdscr, 0, 0, 16, w-20-2)
-
     draw_box(stdscr, 0, w-20-1, 10, 20)
     draw_box(stdscr, 11, w-20-1, 5, 20)
 
@@ -194,17 +213,30 @@ def draw_home(stdscr):
 
 
     # Game Names
-    stdscr.addstr(3, 2, "[0] Zetamac")
-    stdscr.addstr(4, 2, "[1] 24")
-    stdscr.addstr(5, 2, "[3] Sequences")
-    stdscr.addstr(6, 2, "[4] Probability")
-    stdscr.addstr(7, 2, "[5] Approximation")
-    stdscr.addstr(8, 2, "[6] Approximation")
+    # Displaying numbers and brackets in regular style
+    stdscr.addstr(3, 2, "[0] ", curses.A_NORMAL)
+    stdscr.addstr(4, 2, "[1] ", curses.A_NORMAL)
+    stdscr.addstr(5, 2, "[3] ", curses.A_NORMAL)
+    stdscr.addstr(6, 2, "[4] ", curses.A_NORMAL)
+    stdscr.addstr(7, 2, "[5] ", curses.A_NORMAL)
+    stdscr.addstr(8, 2, "[6] ", curses.A_NORMAL)
+    stdscr.addstr(11, 2, "[A] ", curses.A_NORMAL)
+    stdscr.addstr(12, 2, "[B] ", curses.A_NORMAL)
+    stdscr.addstr(13, 2, "[C] ", curses.A_NORMAL)
+    stdscr.addstr(14, 2, "[D] ", curses.A_NORMAL)
 
-    stdscr.addstr(11, 2, "[A] Type Speed")
-    stdscr.addstr(12, 2, "[B] Live Problems")
-    stdscr.addstr(13, 2, "[C] Trading/Gambling")
-    stdscr.addstr(14, 2, "[D] Full Interview")
+    # Displaying game names in bold style
+    stdscr.addstr(3, 6, "Zetamac", curses.A_BOLD)
+    stdscr.addstr(4, 6, "24", curses.A_BOLD)
+    stdscr.addstr(5, 6, "Sequences", curses.A_BOLD)
+    stdscr.addstr(6, 6, "Probability", curses.A_BOLD)
+    stdscr.addstr(7, 6, "Approximation", curses.A_BOLD)
+    stdscr.addstr(8, 6, "Approximation", curses.A_BOLD)
+    stdscr.addstr(11, 6, "Type Speed", curses.A_BOLD)
+    stdscr.addstr(12, 6, "Live Problems", curses.A_BOLD)
+    stdscr.addstr(13, 6, "Trading/Gambling", curses.A_BOLD)
+    stdscr.addstr(14, 6, "Full Interview", curses.A_BOLD)
+
 
     add_skill_bars(stdscr)
 
@@ -234,7 +266,7 @@ def draw_home(stdscr):
         if key == ord('H') or key == ord('h'):
             continue
         elif key == ord('0'):
-            return 'game_mode0'
+            return 'game0_zeta'
         elif key == ord('1'):
             game_mode1(stdscr, h, w)
         # ... (Add more elif blocks for other game modes) ...
@@ -243,10 +275,12 @@ def draw_home(stdscr):
 
     return 'home'
 
-def game_mode0(stdscr):
+def game0_zeta(stdscr):
     presets = {'a': [60, 3], 'b': [120, 2], 'c': [100, 5]}
+    stdscr.clear()
     while True:
-        stdscr.clear()
+        for i in range(3, 15):
+            stdscr.addstr(i, 2, "                                                       ") # same operation
         stdscr.refresh()
         stdscr.keypad(True)
 
@@ -271,6 +305,12 @@ def game_mode0(stdscr):
             stdscr.addch(j, 58, curses.ACS_VLINE)
         stdscr.addch(2, 58, curses.ACS_TTEE) 
         stdscr.addch(27, 58, curses.ACS_BTEE) 
+        
+        # Filling in text 
+        stdscr.addstr(h-3, 2, " COMMANDS ")
+        stdscr.addstr(h-2, 3, "'home' to exit                           |    ")
+        stdscr.addstr(h-1, 3, "'game [time in seconds] [difficulty 1-5] |    ")
+
 
 
         y, x = 3, 3  # Position of the text field
@@ -306,10 +346,10 @@ def game_mode0(stdscr):
             return 'home'
         
         # Now, match against input_str   
-        pattern = r"run (\d{1,3}) (\d) ?(p?)"
+        pattern = r"game (\d{1,3}) (\d) ?(p?)"
         match = re.fullmatch(pattern, input_str)
 
-        pattern2 = r"run ([a-f])"
+        pattern2 = r"game ([a-f])"
         match2 = re.fullmatch(pattern2, input_str)
 
         if (match):
@@ -317,17 +357,18 @@ def game_mode0(stdscr):
             time_val = int(match.group(1))
             difficulty_val = int(match.group(2))
             optional_p = match.group(3)
-            start_game(stdscr, time_val, difficulty_val)
+            start_zeta(stdscr, time_val, difficulty_val)
 
         elif (match2):
             time_val = presets[match2.group(1)][0]
             difficulty_val = presets[match2.group(1)][1]
             optional_p = 'p'
-            start_game(stdscr, time_val, difficulty_val)
+            start_zeta(stdscr, time_val, difficulty_val)
 
         else: 
-            stdscr.addstr(5, 3, f"'{input_str}' is not a valid command")
-            stdscr.addstr(6, 3, "Press ↳ to try again")
+            stdscr.addstr(5, 3, f"'{input_str}'")
+            stdscr.addstr(6, 3, "is not a valid command")
+            stdscr.addstr(7, 3, "Press ↳ to try again")
             stdscr.getch()  # Wait for another key press to exit, currently just resets 
             stdscr.refresh()
             
@@ -340,10 +381,10 @@ def game_mode0(stdscr):
             return 'home'
         '''
         
-        # Type: ‘run [time] [difficulty] [p (optional)]’
-        # e.g 'run 120 3 p
+        # Type: game [time] [difficulty] [p (optional)]’
+        # e.g 'game 120 3 p
 
-    return 'game_mode0'
+    return 'game0_zeta'
 
 def game_mode1(stdscr):
     # use QWAS to select the boxes and then 7-0 to select operations or just mouse 
@@ -359,7 +400,6 @@ def game_mode1(stdscr):
 
 # Add more game_mode functions...
 
-
 def main(stdscr):
     # Initialize color support
     curses.start_color()
@@ -368,6 +408,7 @@ def main(stdscr):
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
     curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_WHITE)  
     curses.init_pair(3, curses.COLOR_RED, curses.COLOR_WHITE) 
+    curses.init_pair(4, curses.COLOR_WHITE, curses.COLOR_RED)
 
     # Apply the color pair to stdscr
     stdscr.bkgd(' ', curses.color_pair(1))
@@ -383,18 +424,13 @@ def main(stdscr):
     while True:
         stdscr.clear()
         h_curr, w_curr = stdscr.getmaxyx()
-
-        if h_curr < h_min or w_curr < w_min:
+        if h_curr <= h_min or w_curr <= w_min:
             # Show a live read of the screen size 
-            stdscr.addstr(0, 0, "Please resize the window to at least 30x80.")
+            stdscr.addstr(0, 0, "Please resize the window to at least 30 x 80")
+            stdscr.addstr(1, 0, f"Currently: {h_curr:3} x {w_curr:3}")
+            stdscr.addstr(2, 0, "You may use ⌘- / ⌘+")
         else:
-            # Code to draw your interface here, e.g., draw_box(stdscr, 0, 0, 2, w - 1)
-            stdscr.addstr(0, 0, "Window resized successfully. Press 'q' to quit.")
-            
-            # Listen for 'q' key to break the loop
-            key = stdscr.getch()
-            if key == ord('q') or key == ord('Q'):
-                break
+            break
 
         # Refresh the screen
         stdscr.refresh()
@@ -406,8 +442,8 @@ def main(stdscr):
     while True:
         if current_mode == 'home':
             current_mode = draw_home(stdscr)
-        elif current_mode == 'game_mode0':
-            current_mode = game_mode0(stdscr)
+        elif current_mode == 'game0_zeta':
+            current_mode = game0_zeta(stdscr)
     draw_home(stdscr)
     
 if __name__ == "__main__":
