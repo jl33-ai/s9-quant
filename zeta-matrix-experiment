@@ -1,0 +1,226 @@
+# ZETA MATRIX
+# Created by Justin Lee on the 14th of September, 2023 
+
+# ⣿
+
+from curses.textpad import Textbox, rectangle
+import curses
+import json
+import datetime
+import time
+import random
+import re
+
+zeta_matrix_add = [['inf' for _ in range(2, 101)] for _ in range(2, 101)]
+zeta_matrix_sub = [['inf' for _ in range(2, 101)] for _ in range(2, 101)]
+zeta_matrix_mult = [['inf' for _ in range(2, 101)] for _ in range(2, 101)]
+zeta_matrix_divi = [['inf' for _ in range(2, 101)] for _ in range(2, 101)]
+
+def generate_question(decimals = False):
+    op_list = ['+', '-', '*', '/']
+    oper = '+' #random.choice(op_list)
+
+    #if difficulty == 1:  # One decimal place
+
+    if not decimals: 
+        add_range = [(2, 100), (2, 100)]
+        mult_range = [(2, 12), (2, 100)]
+        
+        # fill in here 
+        if oper in ['+', '-']:
+            num1 = random.randint(add_range[0][0], add_range[0][1])
+            num2 = random.randint(add_range[1][0], add_range[1][1])
+
+        elif oper == "*": 
+            num1 = random.randint(mult_range[0][0], mult_range[0][1])
+            num2 = random.randint(mult_range[1][0], mult_range[1][1])
+            answer = eval(f"{num1} {oper} {num2}")
+
+        elif oper == "/": 
+            num2 = random.randint(mult_range[0][0], mult_range[0][1])
+            num1 = random.randint(mult_range[1][0], mult_range[1][1])
+            product = num1 * num2
+            answer = num1
+            num1 = product
+
+    else: 
+
+        add_range = [(20, 1000), (20, 130)]
+        mult_range = [(20, 130), (20, 100)]
+        decimal_places = 1
+
+        if oper in ['+', '-']:
+            num1 = round(random.uniform(add_range[0][0], add_range[0][1]), decimal_places)
+            num2 = round(random.uniform(add_range[1][0], add_range[1][1]), decimal_places)
+            answer = round(num1 + num2, decimal_places) if oper == '+' else round(num1 - num2, decimal_places)
+
+        elif oper == '*':
+            num1 = round(random.uniform(mult_range[0][0], mult_range[0][1]), decimal_places)
+            num2 = round(random.uniform(mult_range[1][0], mult_range[1][1]), decimal_places)
+            answer = round(num1 * num2, decimal_places)
+
+        elif oper == '/':
+            num1 = round(random.uniform(mult_range[0][0], mult_range[0][1]), decimal_places)
+            num2 = round(random.uniform(mult_range[1][0], mult_range[1][1]), decimal_places)
+            while num2 == 0:  # Ensure we're not dividing by zero
+                num2 = round(random.uniform(mult_range[1][0], mult_range[1][1]), decimal_places)
+            answer = round(num1 / num2, decimal_places)
+
+    return num1, oper, num2
+
+def draw_box(stdscr, y, x, height, width):
+    h_max, w_max = stdscr.getmaxyx()
+    if y + height >= h_max or x + width >= w_max:
+        return  
+    
+    # Draw the top and bottom
+    stdscr.addch(y, x, curses.ACS_ULCORNER)
+    stdscr.addch(y, x + width, curses.ACS_URCORNER)
+    stdscr.addch(y + height, x, curses.ACS_LLCORNER)
+    stdscr.addch(y + height, x + width, curses.ACS_LRCORNER)
+
+    # Draw the sides
+    for i in range(y+1, y + height):
+        stdscr.addch(i, x, curses.ACS_VLINE)
+        stdscr.addch(i, x + width, curses.ACS_VLINE)
+
+    # Draw the top and bottom
+    for i in range(x+1, x + width):
+        stdscr.addch(y, i, curses.ACS_HLINE)
+        stdscr.addch(y + height, i, curses.ACS_HLINE)
+
+def draw_home(stdscr):
+
+    # Set up TUI 
+    stdscr.clear()
+    draw_box(stdscr, 0, 0, 25, 60)
+    for w in range(5, 55):
+        for h in range(4, 24):
+            stdscr.addch(h, w, "⣿") 
+
+    for i in range(1, 60): 
+        stdscr.addch(3, i, curses.ACS_HLINE) 
+    stdscr.addch(3, 0, curses.ACS_LTEE) 
+    stdscr.addch(3, 60, curses.ACS_RTEE) 
+
+    stdscr.addstr(0, 2, " ζ-ZetaMatrix ", curses.A_STANDOUT)
+
+
+    stdscr.refresh()
+
+
+
+
+
+    # Start zeta-matrix
+    while True: 
+
+        play_zeta(stdscr)
+        key = stdscr.getch()
+    
+def play_zeta(stdscr):
+    # Waits for '_' space to start 
+    # 1 second pause and then the first question 
+
+
+    time.sleep(0.5)
+    
+    # Make cursor visible
+    curses.curs_set(2)    
+    while True: 
+        time_recent = time.time()
+        score = 0  # This isn't used, but it's initialized here. You might want to update or use it somewhere.
+        
+        answer_str = ''
+        
+        # Assuming generate_question() returns num1, oper, num2 in that order.
+        num1, oper, num2 = generate_question()
+        question = f"{num1} {oper} {num2}"
+        ans = eval(question)
+
+        stdscr.addstr(2, 15, f"> {question} =      ")
+        stdscr.move(2, 20 + len(question))
+        stdscr.refresh()
+        
+        while True: 
+            elapsed_time = time.time() - time_recent
+
+            if elapsed_time >= 30:
+                # If it takes more than 30 seconds to complete a question the game resets 
+                break
+
+            key = stdscr.getch()
+
+            if key == curses.KEY_ENTER or key == 10 or key == 13:
+                pass
+            elif key in [curses.KEY_BACKSPACE, ord('\b'), ord('\x7f')]:
+                if len(answer_str) > 0:
+                    answer_str = answer_str[:-1]
+                    stdscr.addstr(2, 20 + len(question) + len(answer_str), ' ')
+                    stdscr.refresh()
+            elif len(answer_str) + 1 < 10 and (chr(key).isdigit() or chr(key) in ['-', '.']):
+                answer_str += chr(key)
+            
+            stdscr.addstr(2, 20 + len(question), answer_str)
+            stdscr.refresh()
+            
+            # Check whether the answer is correct 
+            try:
+                if int(answer_str) == ans:
+                    time_taken = time.time() - time_recent
+                    zeta_matrix_add[num1][num2] = time_taken 
+
+                    # Print to screen for diagnostics
+                    stdscr.addstr(1, 40, f"{num1}, {num2}, {round(time_taken, 2)}s   ")
+
+
+
+                    stdscr.refresh()
+                    time_recent = time.time()
+                    break  # Go to the next question
+            except ValueError:
+                continue 
+
+    return 
+
+
+def main(stdscr):
+    # Initialize color support
+    curses.start_color()
+    
+    # Initialize color pairs (Foreground: White, Background: Black)
+    curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+    curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_WHITE)  
+    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_WHITE) 
+    curses.init_pair(4, curses.COLOR_WHITE, curses.COLOR_RED)
+
+    # Apply the color pair to stdscr
+    stdscr.bkgd(' ', curses.color_pair(1))  
+    
+    # Screen dimensions
+    h, w = 25, 60
+    h_min, w_min = h, w
+
+    # Screen sizing loop
+    while True:
+        stdscr.clear()
+        h_curr, w_curr = stdscr.getmaxyx()
+        if h_curr <= h_min or w_curr <= w_min:
+            # Show a live read of the screen size 
+            stdscr.addstr(0, 0, "Please resize the window to at least 50x20")
+            stdscr.addstr(1, 0, f"Currently: {h_curr:3} x {w_curr:3}")
+            stdscr.addstr(2, 0, "You may use ⌘- / ⌘+")
+        else:
+            break
+
+        # Refresh the screen
+        stdscr.refresh()
+    
+    draw_home(stdscr)
+
+    # CENTRAL LOOP 
+    
+    
+# Start 
+if __name__ == "__main__":
+    curses.wrapper(main)

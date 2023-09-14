@@ -52,3 +52,6 @@ Solving algorithm:
 - ⇒ $4! *  4^3$
 
 [Curses Python](https://docs.python.org/3/library/curses.html)
+
+
+![MacOSMojave](image.png)
