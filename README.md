@@ -12,7 +12,8 @@ A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercis
 
 # TO-DO
 - Every question you complete gives you a QXP, with multipliers for streaks etc. 
-- It needs a... Scraper. 
+- It needs a... Scraper.
+- Might need to borrow pdf parser
 - 'QXP earned: ' 
 - Database
 - :-( :-| :-) 𝝈 - whil eyou're playing. The sigma is multicoloured
