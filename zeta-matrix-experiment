@@ -1,24 +1,63 @@
 # ZETA MATRIX
 # Created by Justin Lee on the 14th of September, 2023 
+# Occupation
+# Have you completed or recieved an internship from a trading company 
+# Should measure something deeper than 'are quant traders better at ____' 
+# but... should measure learning curve. yes. How about each cell is a stack. It measures the average increment 
+# Could investigate learning curve...
+# Investigate learnings curves and use an index. yes. okay gonna have to keep their speed score and an index. 
+# i create fun minigames that are disguised tools to prove economic theories such as risk aversion, or behavioral biases, or just other interesting data insights - e.g what is the hardest combination of sum. 
+# Time complexity
+# Interestingly: this is a good data structure problem
+# I'm thinking since I need to construct the zeta matrix but also have timestamped questions... 
+# A .csv of timestamp, num1, operator, num2, timetaken
+# Then iterate down this list and construct the zetamatrix 
+# Then it will be one continuous... time series. 
+# Lets say you have n questions complete. 
+# hypothesis test: the previous one taking long results in the next one.
+# Could implement an enter button... nah that's not zetamac. 
 
-# ⣿
+# 1 = +, 2 = -, 3 = *, 4 = /
+#  ⣿
+
+# Cache the matrix for computation. (save the timestamp that it got up to.) No even easier - the zetamatrix itself is simply the best time... yeah
 
 from curses.textpad import Textbox, rectangle
 import curses
 import json
 import datetime
-import time
 import random
 import re
+import csv
+import time
 
-zeta_matrix_add = [['inf' for _ in range(2, 101)] for _ in range(2, 101)]
-zeta_matrix_sub = [['inf' for _ in range(2, 101)] for _ in range(2, 101)]
-zeta_matrix_mult = [['inf' for _ in range(2, 101)] for _ in range(2, 101)]
-zeta_matrix_divi = [['inf' for _ in range(2, 101)] for _ in range(2, 101)]
+class CSVAppender:
+    def __init__(self, filename='/Users/justinlee/Documents/projport/s9-quant/data.csv'):
+        self.filename = filename
+        self.file = open(filename, 'a', newline='')
+        self.writer = csv.writer(self.file)
+
+        # Check if the file already has content
+        # If not, write headers
+        if self.file.tell() == 0:
+            self.writer.writerow(["timestamp", "num1", "operator", "num2", "timetaken", "got_wrong"])
+
+    def append(self, timestamp, num1, operator, num2, timetaken, got_wrong):
+        self.writer.writerow([timestamp, num1, operator, num2, timetaken, got_wrong])
+        # If you want to ensure data is written immediately (not buffered), uncomment next line:
+        # self.file.flush()
+
+    def close(self):
+        self.file.close()
+
+zetaMatrix_add = [['inf' for _ in range(2, 101)] for _ in range(2, 101)]
+zetaMatrix_sub = [['inf' for _ in range(2, 101)] for _ in range(2, 101)]
+zetaMatrix_mult = [['inf' for _ in range(2, 101)] for _ in range(2, 13)]
+zetaMatrix_divi = [['inf' for _ in range(2, 101)] for _ in range(2, 13)]
 
 def generate_question(decimals = False):
     op_list = ['+', '-', '*', '/']
-    oper = '+' #random.choice(op_list)
+    oper = random.choice(op_list)
 
     #if difficulty == 1:  # One decimal place
 
@@ -42,29 +81,6 @@ def generate_question(decimals = False):
             product = num1 * num2
             answer = num1
             num1 = product
-
-    else: 
-
-        add_range = [(20, 1000), (20, 130)]
-        mult_range = [(20, 130), (20, 100)]
-        decimal_places = 1
-
-        if oper in ['+', '-']:
-            num1 = round(random.uniform(add_range[0][0], add_range[0][1]), decimal_places)
-            num2 = round(random.uniform(add_range[1][0], add_range[1][1]), decimal_places)
-            answer = round(num1 + num2, decimal_places) if oper == '+' else round(num1 - num2, decimal_places)
-
-        elif oper == '*':
-            num1 = round(random.uniform(mult_range[0][0], mult_range[0][1]), decimal_places)
-            num2 = round(random.uniform(mult_range[1][0], mult_range[1][1]), decimal_places)
-            answer = round(num1 * num2, decimal_places)
-
-        elif oper == '/':
-            num1 = round(random.uniform(mult_range[0][0], mult_range[0][1]), decimal_places)
-            num2 = round(random.uniform(mult_range[1][0], mult_range[1][1]), decimal_places)
-            while num2 == 0:  # Ensure we're not dividing by zero
-                num2 = round(random.uniform(mult_range[1][0], mult_range[1][1]), decimal_places)
-            answer = round(num1 / num2, decimal_places)
 
     return num1, oper, num2
 
@@ -96,7 +112,7 @@ def draw_home(stdscr):
     draw_box(stdscr, 0, 0, 25, 60)
     for w in range(5, 55):
         for h in range(4, 24):
-            stdscr.addch(h, w, "⣿") 
+            stdscr.addch(h, w, "░") #⣿
 
     for i in range(1, 60): 
         stdscr.addch(3, i, curses.ACS_HLINE) 
@@ -114,21 +130,28 @@ def draw_home(stdscr):
 
     # Start zeta-matrix
     while True: 
-
-        play_zeta(stdscr)
+        stdscr.addstr(2, 15, "Tap any key 3 times to begin")
         key = stdscr.getch()
-    
+        key = stdscr.getch()
+        key = stdscr.getch()
+        stdscr.addstr(2, 15, "                             ")
+        play_zeta(stdscr)
+        
 def play_zeta(stdscr):
+
     # Waits for '_' space to start 
     # 1 second pause and then the first question 
 
-
-    time.sleep(0.5)
+    appender = CSVAppender()
+    stdscr.addstr(2, 15, " Ready? ")
+    stdscr.refresh()
+    time.sleep(0.75)
     
     # Make cursor visible
     curses.curs_set(2)    
     while True: 
         time_recent = time.time()
+        got_wrong = False
         score = 0  # This isn't used, but it's initialized here. You might want to update or use it somewhere.
         
         answer_str = ''
@@ -144,10 +167,6 @@ def play_zeta(stdscr):
         
         while True: 
             elapsed_time = time.time() - time_recent
-
-            if elapsed_time >= 30:
-                # If it takes more than 30 seconds to complete a question the game resets 
-                break
 
             key = stdscr.getch()
 
@@ -166,23 +185,38 @@ def play_zeta(stdscr):
             
             # Check whether the answer is correct 
             try:
+                if int(answer_str) == 9999:
+                    appender.close()
+                    return
+                
                 if int(answer_str) == ans:
-                    time_taken = time.time() - time_recent
-                    zeta_matrix_add[num1][num2] = time_taken 
-
+                    time_taken = round(time.time() - time_recent, 3)
+                    if time_taken > 90: break # Anything over 90 seconds is considered errenous (sorry)
+                    
+                    appender.append(time.time(), num1, oper, num2, time_taken, got_wrong)
                     # Print to screen for diagnostics
-                    stdscr.addstr(1, 40, f"{num1}, {num2}, {round(time_taken, 2)}s   ")
-
-
+                    # stdscr.addstr(1, 40, f"{num1}, {num2}, {time_taken}s   ")
+                    # stdscr.addstr(1, 59, f"⏲")
 
                     stdscr.refresh()
                     time_recent = time.time()
                     break  # Go to the next question
+                if len(answer_str) >= len(str(ans)):
+                    got_wrong = True
+
+                
+
             except ValueError:
                 continue 
 
     return 
 
+def draw_zetaMatrix(stdscr, type='add'):
+
+    # First, clear the area (just to be safe) 
+    # Now, draw the corresponding 
+    # for _ in 
+    return 
 
 def main(stdscr):
     # Initialize color support
@@ -207,7 +241,7 @@ def main(stdscr):
         h_curr, w_curr = stdscr.getmaxyx()
         if h_curr <= h_min or w_curr <= w_min:
             # Show a live read of the screen size 
-            stdscr.addstr(0, 0, "Please resize the window to at least 50x20")
+            stdscr.addstr(0, 0, "Please resize the window to at least 25x60")
             stdscr.addstr(1, 0, f"Currently: {h_curr:3} x {w_curr:3}")
             stdscr.addstr(2, 0, "You may use ⌘- / ⌘+")
         else:
@@ -224,3 +258,6 @@ def main(stdscr):
 # Start 
 if __name__ == "__main__":
     curses.wrapper(main)
+
+
+# Refresht he screen buttonso beautiful. How do they do it. 
