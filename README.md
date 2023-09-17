@@ -55,14 +55,14 @@ Solving algorithm:
 [Curses Python](https://docs.python.org/3/library/curses.html)
 
 ZetaMatrix
-- make the matrix bigger, 1-15 multiplication
-- 120 seconds 
-- number of wrong attempts
-- ? / 10,000 contributed 
-- Theme()
-- numpad practice
-- backspace
-- [] sessions, 120s. 
+- [ ] make the matrix bigger, 1-15 multiplication
+- [ ] 120 seconds 
+- [ ] number of wrong attempts
+- [ ] ? / 10,000 contributed 
+- [ ] Theme()
+- [ ] numpad practice
+- [ ] backspace
+- [ ] sessions, 120s. 
 
 
 ![MacOSMojave](image.png)
