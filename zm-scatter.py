@@ -1,6 +1,9 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats import zscore
+
 
 def plot_time_scores(csv_path: str) -> None:
     """
@@ -12,26 +15,54 @@ def plot_time_scores(csv_path: str) -> None:
     Returns:
     - None. Displays the plot.
     """
+    # To Do: colour code by 'sessions (points reasonably clustered) and this could be alternating
     
     # Read data from the csv file
     df = pd.read_csv(csv_path)
 
     # Convert timestamp to datetime format
     df['datetime'] = pd.to_datetime(df['timestamp'], unit='s')
+
+    # Apply a sqrt transform to the data to stablise the variance and centre the mean
+    #df['transformed_time'] = df['timetaken'].apply(lambda x: np.sqrt(x))
+    df['log_time'] = df['timetaken'].apply(lambda x: np.log(x+0.001))
+    #df['zscore_time'] = zscore(df['transformed_time'])
+
     
     # Map colors based on whether the answer was correct or wrong
     colours = df['got_wrong'].map({True: 'red', False: 'green'})
     
     # Plot using Seaborn
     plt.figure(figsize=(10, 6))
-    sns.scatterplot(x=df.index, y=df['timetaken'], color=colours)
+    sns.scatterplot(
+        x=df.index, 
+        y=df['log_time'], 
+        hue=df['got_wrong'],
+        palette={True: 'red', False: 'green'},
+        style=df['got_wrong'],
+        markers={True: 'X', False: 'o'},
+        sizes=50,  # Adjusted sizes for smaller dots
+        alpha=0.6
+    )   
 
+    # Improve x-axis labeling
     plt.xticks(rotation=45)
-    plt.xlabel('Date-Time')
-    plt.ylabel('Time Taken')
-    plt.title('Dot Plot of Time Scores over Date-Time')
+   #plt.gca().set_xticks(plt.gca().get_xticks()[::int(len(df['datetime'])/10)]) 
+
+    plt.xlabel('Sequence of Attempts')
+    plt.ylabel('Time Taken (Log Transformed)')
+    plt.title('Time Scores Distribution Over Time Based on Correctness')
+    plt.grid(True, which="both", ls="--", c='0.7')  # Adding a grid for better readability
+    plt.legend(title='First try', loc='upper right', labels=['Yes', 'No'])
+
+    # Adjust layout
     plt.tight_layout()
-    plt.show()
+
+    # SAVE
+    plt.savefig(f"scatter-{df.index[-1]}", dpi=300)
+
+    # SHOW
+    # plt.show()
 
 if __name__ == "__main__":
     csv_path = '/Users/justinlee/Documents/projport/s9-quant/data.csv'

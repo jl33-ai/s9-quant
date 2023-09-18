@@ -16,6 +16,8 @@
 # Lets say you have n questions complete. 
 # hypothesis test: the previous one taking long results in the next one.
 # Could implement an enter button... nah that's not zetamac. 
+# Best settings are ______ and you can scale terminal up
+# sessions should be easy to compute... make like a zen mode with a sleeping cat. It should be used as focus
 
 # 1 = +, 2 = -, 3 = *, 4 = /
 #  ⣿
@@ -31,6 +33,24 @@ import re
 import csv
 import time
 
+garden_str = """     `!,
+    -( )-
+    /'|\`                        /
+      | \ `                     //
+                               ///
+             ###              /[_]
+            #####              [][
+          #{##{####       o~   [_]
+         ###\#}#}###      /`\  [][
+          ###\{/###      [ /%\ [_]
+           # }}{ #       [_|_\_[][
+       ###   }}{           [_][__]
+      #\#}#} }}{@  @       [___][]
+      ##\/## }}{|@@|/      [_][__]
+,ejm,,,,}{,,,}{{||||_______[___][]"""
+# × ÷
+oper_dict = {'+': '+', '-': '-', '*': '×', '/': '÷'}
+
 class CSVAppender:
     def __init__(self, filename='/Users/justinlee/Documents/projport/s9-quant/data.csv'):
         self.filename = filename
@@ -40,20 +60,88 @@ class CSVAppender:
         # Check if the file already has content
         # If not, write headers
         if self.file.tell() == 0:
-            self.writer.writerow(["timestamp", "num1", "operator", "num2", "timetaken", "got_wrong"])
+            self.writer.writerow(["timestamp", "num1", "operator", "num2", "timetaken", "got_wrong", "timed"])
 
-    def append(self, timestamp, num1, operator, num2, timetaken, got_wrong):
-        self.writer.writerow([timestamp, num1, operator, num2, timetaken, got_wrong])
+    def append(self, timestamp, num1, operator, num2, timetaken, got_wrong, timed):
+        self.writer.writerow([timestamp, num1, operator, num2, timetaken, got_wrong, timed])
         # If you want to ensure data is written immediately (not buffered), uncomment next line:
         # self.file.flush()
 
+    def calculate_average(self):
+        # Returns as string
+        try:
+            df = pd.read_csv(self.filename)
+            
+            # Check if dataframe is empty or the column 'timetaken' is not present
+            if df.empty or 'timetaken' not in df.columns:
+                return "n/a"
+
+            # Calculate and return the average
+            return str(round(df['timetaken'].mean(), 4))
+
+        except Exception as e:
+            print(f"Error: {e}")
+            return "n/a"
+        
+    def create_zm(self):
+
+        # Filter the DataFrame based on operation
+        operation_df = df[df['operator'] == operation]
+        
+        # If there's no data for this operation, just return
+        if operation_df.empty:
+            print(f"No data available for operation: {operation}")
+            return
+        
+        # Create an empty matrix filled with NaNs, depending on dimensions of operation
+        if operation in ['+', '-']:
+            matrix = np.full((99, 99), np.nan)
+        else: 
+            matrix = np.full((11, 99), np.nan)
+        
+        # Populate the matrix using the data from the DataFrame
+        # MUST AMEND THIS SO THAT IT ONLY UPDATES WITH FASTER TIMES
+        # Also store a counter for how many unique combos have been tried 
+        for index, row in operation_df.iterrows():
+            matrix[int(row['num1'])-2][int(row['num2'])-2] = row['timetaken'] 
+
     def close(self):
         self.file.close()
+    
 
-zetaMatrix_add = [['inf' for _ in range(2, 101)] for _ in range(2, 101)]
-zetaMatrix_sub = [['inf' for _ in range(2, 101)] for _ in range(2, 101)]
-zetaMatrix_mult = [['inf' for _ in range(2, 101)] for _ in range(2, 13)]
-zetaMatrix_divi = [['inf' for _ in range(2, 101)] for _ in range(2, 13)]
+def show_stats(stdscr): 
+    """
+    Calculates user E(X) and Var(X) and displays to screen 
+    """
+
+    # Lay out TUI
+    draw_box(stdscr, 5, 1, 19, 28)
+    draw_box(stdscr, 5, 30, 19, 29)
+
+    draw_line(stdscr, 9, 2, 27)
+    draw_line(stdscr, 11, 31, 28)
+
+    # Profile
+    stdscr.addstr(5, 2, " Profile ", curses.A_BOLD)
+    stdscr.addstr(6, 2, " User ID:  ")
+
+    # Statistics 
+    stdscr.addstr(7, 2, " E[S]:     ")
+    stdscr.addstr(8, 2, " Var[S]:     ")
+    stdscr.addstr(9, 2, " Done:     ")
+
+    # Leaderboard / ASCII art 
+
+    # Zetamatrix 
+    
+    for w in range(31, 59):
+        for h in range(12, 24):
+           stdscr.addch(h, w, "░") #⣿
+    
+
+    # add other line structures. 
+    return 
+
 
 def generate_question(decimals = False):
     op_list = ['+', '-', '*', '/']
@@ -105,19 +193,27 @@ def draw_box(stdscr, y, x, height, width):
         stdscr.addch(y, i, curses.ACS_HLINE)
         stdscr.addch(y + height, i, curses.ACS_HLINE)
 
+def draw_line(stdscr, y, x, l): 
+        for i in range(x, x+l):
+            stdscr.addch(y, i, curses.ACS_HLINE) 
+        stdscr.addch(y, x-1, curses.ACS_LTEE) 
+        stdscr.addch(y, x+l, curses.ACS_RTEE) 
+
 def draw_home(stdscr):
 
     # Set up TUI 
     stdscr.clear()
     draw_box(stdscr, 0, 0, 25, 60)
-    for w in range(5, 55):
-        for h in range(4, 24):
-            stdscr.addch(h, w, "░") #⣿
 
-    for i in range(1, 60): 
-        stdscr.addch(3, i, curses.ACS_HLINE) 
-    stdscr.addch(3, 0, curses.ACS_LTEE) 
-    stdscr.addch(3, 60, curses.ACS_RTEE) 
+    '''
+    # Draws the garden, cat home screen
+    k=7 # start line
+    for line in garden_str.split('\n'): 
+        stdscr.addstr(k, 4, (line)) 
+        k+=1
+    '''
+
+    draw_line(stdscr, 4, 1, 59)
 
     stdscr.addstr(0, 2, " ζ-ZetaMatrix ", curses.A_STANDOUT)
 
@@ -130,6 +226,7 @@ def draw_home(stdscr):
 
     # Start zeta-matrix
     while True: 
+        show_stats(stdscr)
         stdscr.addstr(2, 15, "Tap any key 3 times to begin")
         key = stdscr.getch()
         key = stdscr.getch()
@@ -137,29 +234,28 @@ def draw_home(stdscr):
         stdscr.addstr(2, 15, "                             ")
         play_zeta(stdscr)
         
-def play_zeta(stdscr):
+def play_zeta(stdscr, timed=False):
 
     # Waits for '_' space to start 
     # 1 second pause and then the first question 
-
     appender = CSVAppender()
     stdscr.addstr(2, 15, " Ready? ")
     stdscr.refresh()
     time.sleep(0.75)
     
+    score = 0
     # Make cursor visible
     curses.curs_set(2)    
     while True: 
         time_recent = time.time()
         got_wrong = False
-        score = 0  # This isn't used, but it's initialized here. You might want to update or use it somewhere.
-        
+        stdscr.addstr(1, 40, f"Score: {score}")
         answer_str = ''
         
         # Assuming generate_question() returns num1, oper, num2 in that order.
         num1, oper, num2 = generate_question()
-        question = f"{num1} {oper} {num2}"
-        ans = eval(question)
+        question = f"{num1} {oper_dict[oper]} {num2}"
+        ans = eval(f"{num1} {oper} {num2}")
 
         stdscr.addstr(2, 15, f"> {question} =      ")
         stdscr.move(2, 20 + len(question))
@@ -187,15 +283,17 @@ def play_zeta(stdscr):
             try:
                 if int(answer_str) == 9999:
                     appender.close()
+                    stdscr.addstr(1, 40, "               ")
                     return
                 
                 if int(answer_str) == ans:
+                    score += 1
                     time_taken = round(time.time() - time_recent, 3)
                     if time_taken > 90: break # Anything over 90 seconds is considered errenous (sorry)
                     
-                    appender.append(time.time(), num1, oper, num2, time_taken, got_wrong)
+                    appender.append(time.time(), num1, oper, num2, time_taken, got_wrong, timed)
                     # Print to screen for diagnostics
-                    # stdscr.addstr(1, 40, f"{num1}, {num2}, {time_taken}s   ")
+                    
                     # stdscr.addstr(1, 59, f"⏲")
 
                     stdscr.refresh()

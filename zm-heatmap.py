@@ -30,24 +30,26 @@ def generate_heatmap(operation, df):
         print(f"No data available for operation: {operation}")
         return
     
-    # Create an empty matrix filled with NaNs
+    # Create an empty matrix filled with NaNs, depending on dimensions of operation
     if operation in ['+', '-']:
         matrix = np.full((99, 99), np.nan)
     else: 
         matrix = np.full((11, 99), np.nan)
     
     # Populate the matrix using the data from the DataFrame
+    # MUST AMEND THIS SO THAT IT ONLY UPDATES WITH FASTER TIMES
     for index, row in operation_df.iterrows():
-        matrix[int(row['num1'])-2][int(row['num2'])-2] = row['timetaken']
+        matrix[int(row['num1'])-2][int(row['num2'])-2] = row['timetaken'] 
     
     # Generate the heatmap
-    sns.heatmap(matrix, cmap='YlGnBu', cbar_kws={'label': 'Time Taken'})
+    sns.heatmap(matrix, cmap='viridis_r')
     plt.title(f"Heatmap for {operation_dict[operation]}")
     plt.xlabel('num2')
     plt.ylabel('num1')
-    plt.show()
-
-
+    plt.savefig(f"zetamatrix-{df.index[-1]}-{operation}", dpi=300)
+    plt.clf()
+    # plt.show()
+    
 def generate_heatmaps_from_csv(filename='data.csv'):
     """
     Read data from the CSV file and generate heatmaps for each operation.
@@ -58,7 +60,7 @@ def generate_heatmaps_from_csv(filename='data.csv'):
     df = pd.read_csv(filename)
 
     # For each operation, generate a heatmap
-    for operation in ['+', '-', '*', '/']:
+    for operation in ['+', '-', '*']:
         generate_heatmap(operation, df)
 
 # If this module is run as a script, generate the heatmaps

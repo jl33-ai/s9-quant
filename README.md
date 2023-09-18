@@ -10,7 +10,7 @@ A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercis
 - Generative techniques to formulate questions sets
 - [Recusrive 24 Algorithm](https://w3.cs.jmu.edu/spragunr/CS159/pas/twenty_four/twenty_four.shtml)
 
-# TO-DO
+### TO-DO
 - [ ] Every question you complete gives you a QXP, with multipliers for streaks etc. 
 - [ ] It needs a... Scraper.
 - [ ] Might need to borrow pdf parser
@@ -46,7 +46,7 @@ A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercis
 - [ ] Cookie clicker addictive
 - [ ] Stats: percentile of people, games played,
 - [ ] why mntl math?
-
+- [ ] GUESSTIMATES - use GPT to generate the context. Estimate e.g market is "170 million and our sales are 30 million, what is our market share"
 
 Solving algorithm: 
 - [ ] number of combinations (all 4 numbers must be used once, any of the 4 operations any number of times)
@@ -54,7 +54,11 @@ Solving algorithm:
 
 [Curses Python](https://docs.python.org/3/library/curses.html)
 
-ZetaMatrix
+---
+
+# ZetaMatrix - Zetamac but intelligent (a distracted side project)
+*Literally since year 4, when I first starting doing competitive times tables, I've wanted to know what the hardest ones were and why* <br>
+*Redefining the times tables with data science*
 - [ ] make the matrix bigger, 1-15 multiplication
 - [ ] 120 seconds 
 - [ ] number of wrong attempts
@@ -63,17 +67,44 @@ ZetaMatrix
 - [ ] numpad practice
 - [ ] backspace
 - [ ] sessions, 120s. 
+- [ ] Invert the colourmap and change colours
+- [ ] Can compute your E[X] and Var[X] as in; your average speed, and how consistent you are, from the data
+- [ ] This is computed from a window of maybe 250 most recent answers?^ 
+- [ ] As well as % of questions answered  
+- [ ] Time taken is right skewed so I could take the log
+- [ ] I have my full learning curve rn, so sick. 
+- [ ] Collect more data 
+- [x] Different multiply sign
+- [ ] Tally key presses and how quickly the numbers are typed in... interesting, could do some correaltion
+- [ ] Add the cat
+- [ ] Change the home and game screen, maybe a much smaller zetamatrix, like a 1:5 type thing, cycle through them.
+- [ ] Add more space
+- [ ] Calculate E(V) and E(X) 
+- [ ] Compute top 5 fastest time ever, and the question it was for
+- [ ] Infer weakness (e.g multiplying 2 digit numbers)
+- [ ] Thinking time statistic
+- [ ] It would take 10,000 * 5 seconds (e(v)) to fill out addition alone. Thus, I am calling to. 
+Using statistics, 99% can be filled with just 10 users 
+- [ ] Guesstimates 
+- [ ] A lightbulb for tips like 32 * 28
+- [ ] Average by sessions
+- [ ] Induced learning curve; if it took x2 longer than the users E[S], then start to drill it, and plot the learning curve for a single question combination 
+- [ ] Timed column - indicating if the user started a 120s timed blitz. 
 
-
-![MacOSMojave](image.png)
-
-# Things I expect to see from the ZetaMatrix Data
+### Things I expect to see from the ZetaMatrix Data
 - (when I realised I was truly grateful that I found data science as my craft - the dotplot)
 - The 10's column should have very quick times
-- learning curves
+- Learning curves
+- Variance as well as mean, slimming. 
+- It will be the most interesting once the user sees the same question (5+2), because then we have a controlled experiment. Looking at learning curves over individual questions
+- Rate of 'mistakes' (which could be poisson), should gradually decline. 
+- As the num1/num2 get larger, the circles shouldget darker indicating more thinking time
 
-# Data Inference ideas 
+### Data Inference ideas 
 `1, 2, 4, and 8 primarily` 
+
+- Can engineer 'sessions' (data points are part of the same session if they occur within 2 minutes of each other)
+- This is another feature 
 
 1. **Rate of Improvement**: By tracking a user's performance over time, you can visualize their learning curve. Some users might show rapid initial improvement followed by a plateau, while others might demonstrate steady incremental improvement. This could reflect different learning styles and strategies.
 
