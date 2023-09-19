@@ -2,13 +2,13 @@
 `quant-cat?`
 *A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercises*
 
-<img width="450" alt="image" src="https://github.com/jl33-ai/s9-quant/assets/127172022/04ce2506-d153-4c73-acbf-a0b9a8dff3cf">
-<img width = "450" alt="image" src="https://github.com/jl33-ai/s9-quant/blob/main/heatmaps/scatter-481.png">
-<img width = "450" alt="image" src="https://github.com/jl33-ai/s9-quant/blob/main/heatmaps/zetamatrix-355--.png">
+---
 
 <img width="450" alt="image" src="https://github.com/jl33-ai/s9-quant/assets/127172022/04ce2506-d153-4c73-acbf-a0b9a8dff3cf">
 <img width = "450" alt="image" src="https://github.com/jl33-ai/s9-quant/blob/main/heatmaps/scatter-481.png">
 <img width = "450" alt="image" src="https://github.com/jl33-ai/s9-quant/blob/main/heatmaps/zetamatrix-355--.png">
+
+---
 
 ### Features
 - Intelligently scrapes the web for new questions and news
@@ -137,4 +137,5 @@ Using statistics, 99% can be filled with just 10 users
 
 9. **Adaptive Difficulty**: If your game adjusts in difficulty based on performance, you can analyze how quickly users adapt to more challenging questions. This could provide insights into their adaptability and resilience.
 
-![Moment when James Xu taught me / 11](image-1.png)
+#### Moment when James X taught me / 11:
+![Moment when James X taught me / 11](heatmaps/image.png)
