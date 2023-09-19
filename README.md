@@ -6,6 +6,10 @@
 <img width = "450" alt="image" src="https://github.com/jl33-ai/s9-quant/blob/main/heatmaps/scatter-481.png">
 <img width = "450" alt="image" src="https://github.com/jl33-ai/s9-quant/blob/main/heatmaps/zetamatrix-355--.png">
 
+<img width="450" alt="image" src="https://github.com/jl33-ai/s9-quant/assets/127172022/04ce2506-d153-4c73-acbf-a0b9a8dff3cf">
+<img width = "450" alt="image" src="https://github.com/jl33-ai/s9-quant/blob/main/heatmaps/scatter-481.png">
+<img width = "450" alt="image" src="https://github.com/jl33-ai/s9-quant/blob/main/heatmaps/zetamatrix-355--.png">
+
 ### Features
 - Intelligently scrapes the web for new questions and news
 - GPT wrapper for dynamic q/a's
