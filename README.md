@@ -1,5 +1,10 @@
 # s9-quant
-A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercises
+`quant-cat?`
+*A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercises*
+
+<img width="450" alt="image" src="https://github.com/jl33-ai/s9-quant/assets/127172022/04ce2506-d153-4c73-acbf-a0b9a8dff3cf">
+<img width = "450" alt="image" src="https://github.com/jl33-ai/s9-quant/blob/main/heatmaps/scatter-481.png">
+<img width = "450" alt="image" src="https://github.com/jl33-ai/s9-quant/blob/main/heatmaps/zetamatrix-355--.png">
 
 ### Features
 - Intelligently scrapes the web for new questions and news
@@ -11,6 +16,9 @@ A Blisteringly Simple Terminal based Playground of Raw Quant Mental Math Exercis
 - [Recusrive 24 Algorithm](https://w3.cs.jmu.edu/spragunr/CS159/pas/twenty_four/twenty_four.shtml)
 
 ### TO-DO
+- [ ] WPM
+- [ ] Username, password, and leaderboard
+- [ ] Add Cat
 - [ ] Every question you complete gives you a QXP, with multipliers for streaks etc. 
 - [ ] It needs a... Scraper.
 - [ ] Might need to borrow pdf parser
@@ -90,6 +98,7 @@ Using statistics, 99% can be filled with just 10 users
 - [ ] Average by sessions
 - [ ] Induced learning curve; if it took x2 longer than the users E[S], then start to drill it, and plot the learning curve for a single question combination 
 - [ ] Timed column - indicating if the user started a 120s timed blitz. 
+- [ ] Track typing speed - how. 
 
 ### Things I expect to see from the ZetaMatrix Data
 - (when I realised I was truly grateful that I found data science as my craft - the dotplot)
@@ -123,3 +132,5 @@ Using statistics, 99% can be filled with just 10 users
 8. **Response to Mistakes**: If you track incorrect answers, you can analyze how users respond post-mistake. Do they tend to slow down, indicating caution? Or do they speed up, possibly in frustration or eagerness to move past the error?
 
 9. **Adaptive Difficulty**: If your game adjusts in difficulty based on performance, you can analyze how quickly users adapt to more challenging questions. This could provide insights into their adaptability and resilience.
+
+![Moment when James Xu taught me / 11](image-1.png)

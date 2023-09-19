@@ -38,6 +38,7 @@ def generate_heatmap(operation, df):
     
     # Populate the matrix using the data from the DataFrame
     # MUST AMEND THIS SO THAT IT ONLY UPDATES WITH FASTER TIMES
+    # Also store a counter for how many unique combos have been tried 
     for index, row in operation_df.iterrows():
         matrix[int(row['num1'])-2][int(row['num2'])-2] = row['timetaken'] 
     

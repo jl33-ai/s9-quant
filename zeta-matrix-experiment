@@ -32,6 +32,9 @@ import random
 import re
 import csv
 import time
+import pandas as pd
+
+csv_name = 'data.csv'
 
 garden_str = """     `!,
     -( )-
@@ -52,7 +55,7 @@ garden_str = """     `!,
 oper_dict = {'+': '+', '-': '-', '*': '×', '/': '÷'}
 
 class CSVAppender:
-    def __init__(self, filename='/Users/justinlee/Documents/projport/s9-quant/data.csv'):
+    def __init__(self, filename=('/Users/justinlee/Documents/projport/s9-quant/' + csv_name)):
         self.filename = filename
         self.file = open(filename, 'a', newline='')
         self.writer = csv.writer(self.file)
@@ -67,21 +70,27 @@ class CSVAppender:
         # If you want to ensure data is written immediately (not buffered), uncomment next line:
         # self.file.flush()
 
-    def calculate_average(self):
-        # Returns as string
+    def calculate_exp_std(self):
+        # Returns as (string, string) tuple
         try:
             df = pd.read_csv(self.filename)
             
             # Check if dataframe is empty or the column 'timetaken' is not present
             if df.empty or 'timetaken' not in df.columns:
-                return "n/a"
+                return "n/a", "n/a"
+            
+            df = df.tail(200)
 
-            # Calculate and return the average
-            return str(round(df['timetaken'].mean(), 4))
+            # Calculate the average
+            exp = str(round(df['timetaken'].mean(), 3))
+
+            # Calculate the variance of the data
+            std = str(round(df['timetaken'].std(ddof=0), 3))
+
+            return exp, std
 
         except Exception as e:
-            print(f"Error: {e}")
-            return "n/a"
+            return "n/a", "n/a"
         
     def create_zm(self):
 
@@ -126,9 +135,16 @@ def show_stats(stdscr):
     stdscr.addstr(6, 2, " User ID:  ")
 
     # Statistics 
-    stdscr.addstr(7, 2, " E[S]:     ")
-    stdscr.addstr(8, 2, " Var[S]:     ")
-    stdscr.addstr(9, 2, " Done:     ")
+    stdscr.addstr(7, 2, " E[S]:        ")
+    stdscr.addstr(8, 2, " Var[S]:      ")
+    appender = CSVAppender()
+    exp, std = appender.calculate_exp_std()
+    appender.close()
+    stdscr.addstr(7, 12, f"{exp}s     ")
+    stdscr.addstr(8, 12, f"{std}s     ")
+
+
+    stdscr.addstr(10, 54, " ᓚᘏᗢ ")
 
     # Leaderboard / ASCII art 
 
@@ -235,7 +251,7 @@ def draw_home(stdscr):
         play_zeta(stdscr)
         
 def play_zeta(stdscr, timed=False):
-
+    # Implement: typing speed test. Need to identify when they've figured it out and the only limitation is typing speed - 
     # Waits for '_' space to start 
     # 1 second pause and then the first question 
     appender = CSVAppender()

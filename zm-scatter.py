@@ -3,6 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import zscore
+from datetime import datetime
 
 
 def plot_time_scores(csv_path: str) -> None:
@@ -59,11 +60,15 @@ def plot_time_scores(csv_path: str) -> None:
     plt.tight_layout()
 
     # SAVE
-    plt.savefig(f"scatter-{df.index[-1]}", dpi=300)
+
+    # Get current date
+    today = datetime.today()
+    formatted_date = today.strftime("%d-%m-%y")
+    plt.savefig("/Users/justinlee/Documents/projport/s9-quant/heatmaps/"+f"scatter-{df.index[-1]}-{formatted_date}", dpi=300)
 
     # SHOW
     # plt.show()
 
 if __name__ == "__main__":
-    csv_path = '/Users/justinlee/Documents/projport/s9-quant/data.csv'
+    csv_path = '/Users/justinlee/Documents/projport/s9-quant/tom_data.csv'
     plot_time_scores(csv_path)
