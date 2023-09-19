@@ -112,12 +112,16 @@ Using statistics, 99% can be filled with just 10 users
 - It will be the most interesting once the user sees the same question (5+2), because then we have a controlled experiment. Looking at learning curves over individual questions
 - Rate of 'mistakes' (which could be poisson), should gradually decline. 
 - As the num1/num2 get larger, the circles shouldget darker indicating more thinking time
+- Factors: - ??? - study: get to 100 as fast as possible or do as many in 2 mins. And some others factor. 5 min session threshold. Factors are typing speed. Could you pick out the moment I realised the / 11 trick. 12’s are hard. 
 
 ### Data Inference ideas 
 `1, 2, 4, and 8 primarily` 
 
+- Typing speed
 - Can engineer 'sessions' (data points are part of the same session if they occur within 2 minutes of each other)
 - This is another feature 
+- See the moment I learnt the /11 trick
+- Even though everyone is on a spectrum, from me to Terry (cracked fast) we want to see if their RELATIVE speeds are the same; i.e no matter the general speed, does everyone find take twice as long to do ? x 12 
 
 1. **Rate of Improvement**: By tracking a user's performance over time, you can visualize their learning curve. Some users might show rapid initial improvement followed by a plateau, while others might demonstrate steady incremental improvement. This could reflect different learning styles and strategies.
 

@@ -29,6 +29,9 @@ def plot_time_scores(csv_path: str) -> None:
     df['log_time'] = df['timetaken'].apply(lambda x: np.log(x+0.001))
     #df['zscore_time'] = zscore(df['transformed_time'])
 
+    # Compute 50 wide rolling average
+    df['rolling_avg'] = df['log_time'].rolling(window=100, min_periods=1).mean()
+
     
     # Map colors based on whether the answer was correct or wrong
     colours = df['got_wrong'].map({True: 'red', False: 'green'})
@@ -45,6 +48,9 @@ def plot_time_scores(csv_path: str) -> None:
         sizes=50,  # Adjusted sizes for smaller dots
         alpha=0.6
     )   
+
+    # Adding the 50-point rolling average line to the plot
+    sns.lineplot(x=df.index, y=df['rolling_avg'], color='blue', label='50-pt Rolling Avg')  
 
     # Improve x-axis labeling
     plt.xticks(rotation=45)
@@ -64,11 +70,11 @@ def plot_time_scores(csv_path: str) -> None:
     # Get current date
     today = datetime.today()
     formatted_date = today.strftime("%d-%m-%y")
-    plt.savefig("/Users/justinlee/Documents/projport/s9-quant/heatmaps/"+f"scatter-{df.index[-1]}-{formatted_date}", dpi=300)
+    plt.savefig("/Users/justinlee/Documents/projport/s9-quant/heatmaps/"+f"scatter-upto-{df.index[-1]}-{formatted_date}", dpi=300)
 
     # SHOW
     # plt.show()
 
 if __name__ == "__main__":
-    csv_path = '/Users/justinlee/Documents/projport/s9-quant/tom_data.csv'
+    csv_path = '/Users/justinlee/Documents/projport/s9-quant/data.csv'
     plot_time_scores(csv_path)

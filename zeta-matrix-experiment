@@ -34,7 +34,7 @@ import csv
 import time
 import pandas as pd
 
-csv_name = 'data.csv'
+csv_path = '/Users/justinlee/Documents/projport/s9-quant/data.csv'
 
 garden_str = """     `!,
     -( )-
@@ -55,7 +55,7 @@ garden_str = """     `!,
 oper_dict = {'+': '+', '-': '-', '*': '×', '/': '÷'}
 
 class CSVAppender:
-    def __init__(self, filename=('/Users/justinlee/Documents/projport/s9-quant/' + csv_name)):
+    def __init__(self, filename=csv_path):
         self.filename = filename
         self.file = open(filename, 'a', newline='')
         self.writer = csv.writer(self.file)
@@ -305,9 +305,8 @@ def play_zeta(stdscr, timed=False):
                 if int(answer_str) == ans:
                     score += 1
                     time_taken = round(time.time() - time_recent, 3)
-                    if time_taken > 90: break # Anything over 90 seconds is considered errenous (sorry)
-                    
-                    appender.append(time.time(), num1, oper, num2, time_taken, got_wrong, timed)
+                    if time_taken < 90:  # Anything over 90 seconds is considered errenous (sorry)
+                        appender.append(time.time(), num1, oper, num2, time_taken, got_wrong, timed)
                     # Print to screen for diagnostics
                     
                     # stdscr.addstr(1, 59, f"⏲")
