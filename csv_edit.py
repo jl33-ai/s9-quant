@@ -3,25 +3,24 @@
 
 import csv
 
-filename = '/Users/justinlee/Documents/projport/s9-quant/data.csv'
+filename = 'data.csv'
 
 # Step 1: Read the CSV data
 with open(filename, 'r') as file:
     reader = csv.reader(file)
     rows = list(reader)
 
-# Step 2: Determine the index from which the rows should be marked as True
-index_for_true = len(rows) - 45 if len(rows) > 45 else 0
+#438, 482
 
 # Step 3: Add the new "timed" column
 header, *data = rows
-header.append("timed")
+header.append("time")
 
 for idx, row in enumerate(data, 1):  # Starting index from 1 to consider header
-    if idx >= index_for_true:
-        row.append("True")
+    if idx >= 438 and idx <= 482:
+        row.append(120)
     else:
-        row.append("False")
+        row.append(0)
 
 # Step 4: Write the updated rows
 with open('new_data.csv', 'w', newline='') as file:

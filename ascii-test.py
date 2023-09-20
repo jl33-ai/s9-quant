@@ -18,3 +18,4 @@ k=5
 for line in garden_str.split('\n'): 
     print(line) 
     k+=1
+

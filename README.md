@@ -20,7 +20,11 @@
 - [Recusrive 24 Algorithm](https://w3.cs.jmu.edu/spragunr/CS159/pas/twenty_four/twenty_four.shtml)
 
 ### TO-DO
-- [ ] WPM
+- [ ] Zetamac; generate all solutions for 24
+- [ ] Reaction time
+- [ ] Date of Birth Tester (how old is...)
+- [ ] PATTERNS
+- [ ] WPM<->
 - [ ] Username, password, and leaderboard
 - [ ] Add Cat
 - [ ] Every question you complete gives you a QXP, with multipliers for streaks etc. 
@@ -89,6 +93,7 @@ Solving algorithm:
 - [x] Different multiply sign
 - [ ] Tally key presses and how quickly the numbers are typed in... interesting, could do some correaltion
 - [ ] Add the cat
+- [ ] Race against
 - [ ] Change the home and game screen, maybe a much smaller zetamatrix, like a 1:5 type thing, cycle through them.
 - [ ] Add more space
 - [ ] Calculate E(V) and E(X) 
@@ -143,3 +148,11 @@ Using statistics, 99% can be filled with just 10 users
 
 #### Moment when James X taught me / 11:
 ![Moment when James X taught me / 11](heatmaps/image.png)
+
+
+Error:
+```
+  File "/Users/justinlee/Documents/projport/s9-quant/zeta-matrix-experiment", line 292, in play_zeta
+    elif len(answer_str) + 1 < 10 and (chr(key).isdigit() or chr(key) in ['-', '.']):
+ValueError: chr() arg not in range(0x110000)
+```

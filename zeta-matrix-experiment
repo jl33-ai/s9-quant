@@ -34,7 +34,7 @@ import csv
 import time
 import pandas as pd
 
-csv_path = '/Users/justinlee/Documents/projport/s9-quant/data.csv'
+csv_path = 'data.csv'
 
 garden_str = """     `!,
     -( )-
@@ -65,8 +65,8 @@ class CSVAppender:
         if self.file.tell() == 0:
             self.writer.writerow(["timestamp", "num1", "operator", "num2", "timetaken", "got_wrong", "timed"])
 
-    def append(self, timestamp, num1, operator, num2, timetaken, got_wrong, timed):
-        self.writer.writerow([timestamp, num1, operator, num2, timetaken, got_wrong, timed])
+    def append(self, timestamp, num1, operator, num2, timetaken, got_wrong, ranked, game_time):
+        self.writer.writerow([timestamp, num1, operator, num2, timetaken, got_wrong, ranked, game_time])
         # If you want to ensure data is written immediately (not buffered), uncomment next line:
         # self.file.flush()
 
@@ -117,6 +117,18 @@ class CSVAppender:
     def close(self):
         self.file.close()
     
+class Button:
+    def __init__(self, text):
+        self.text = text
+        self.selected = False
+
+    def render(self, win, y, x):
+        """Render the button on the window."""
+        if self.selected:
+            win.attron(curses.A_REVERSE)
+        win.addstr(y, x, "[ " + self.text + " ]")
+        if self.selected:
+            win.attroff(curses.A_REVERSE)
 
 def show_stats(stdscr): 
     """
@@ -216,7 +228,6 @@ def draw_line(stdscr, y, x, l):
         stdscr.addch(y, x+l, curses.ACS_RTEE) 
 
 def draw_home(stdscr):
-
     # Set up TUI 
     stdscr.clear()
     draw_box(stdscr, 0, 0, 25, 60)
@@ -230,27 +241,47 @@ def draw_home(stdscr):
     '''
 
     draw_line(stdscr, 4, 1, 59)
-
     stdscr.addstr(0, 2, " ζ-ZetaMatrix ", curses.A_STANDOUT)
-
-
     stdscr.refresh()
-
-
-
-
 
     # Start zeta-matrix
     while True: 
         show_stats(stdscr)
-        stdscr.addstr(2, 15, "Tap any key 3 times to begin")
-        key = stdscr.getch()
-        key = stdscr.getch()
-        key = stdscr.getch()
-        stdscr.addstr(2, 15, "                             ")
-        play_zeta(stdscr)
+        curses.curs_set(0)  # Hide the cursor
+
+        # Define the buttons
+        buttons = [Button("Practice"), Button("60s"), Button("120s"), Button("Ranked")]
+        buttons[0].selected = True  # The first button is selected initially
+
+        current_index = 0
+        while True:
+            # Draw buttons
+            buttons[0].render(stdscr, 2, 11)
+            buttons[1].render(stdscr, 2, 24)
+            buttons[2].render(stdscr, 2, 32)
+            buttons[3].render(stdscr, 2, 41)
+
+            # Get user input
+            key = stdscr.getch()
+
+            # Handle arrow keys for navigation
+            if key == curses.KEY_RIGHT and current_index < len(buttons) - 1:
+                buttons[current_index].selected = False
+                current_index += 1
+                buttons[current_index].selected = True
+            elif key == curses.KEY_LEFT and current_index > 0:
+                buttons[current_index].selected = False
+                current_index -= 1
+                buttons[current_index].selected = True
+            elif key in [curses.KEY_ENTER, ord('\n')]:
+                if current_index == 0: 
+                    stdscr.addstr(2, 5, "                                                  ")
+                    play_zeta(stdscr)
+                elif current_index == 1: 
+                    pass
+                break
         
-def play_zeta(stdscr, timed=False):
+def play_zeta(stdscr, ranked=False, game_time=0):
     # Implement: typing speed test. Need to identify when they've figured it out and the only limitation is typing speed - 
     # Waits for '_' space to start 
     # 1 second pause and then the first question 
@@ -300,13 +331,14 @@ def play_zeta(stdscr, timed=False):
                 if int(answer_str) == 9999:
                     appender.close()
                     stdscr.addstr(1, 40, "               ")
+                    stdscr.addstr(2, 5, "                                                  ")
                     return
                 
                 if int(answer_str) == ans:
                     score += 1
                     time_taken = round(time.time() - time_recent, 3)
                     if time_taken < 90:  # Anything over 90 seconds is considered errenous (sorry)
-                        appender.append(time.time(), num1, oper, num2, time_taken, got_wrong, timed)
+                        appender.append(time.time(), num1, oper, num2, time_taken, got_wrong, ranked, game_time)
                     # Print to screen for diagnostics
                     
                     # stdscr.addstr(1, 59, f"⏲")
