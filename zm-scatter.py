@@ -31,10 +31,9 @@ def plot_time_scores(csv_path: str) -> None:
 
     # Compute 50 wide rolling average
     df['rolling_avg'] = df['log_time'].rolling(window=100, min_periods=1).mean()
-
     
     # Map colors based on whether the answer was correct or wrong
-    colours = df['got_wrong'].map({True: 'red', False: 'green'})
+    colours = df['got_wrong'].map({True: 'red', False: 'green'}) 
     
     # Plot using Seaborn
     plt.figure(figsize=(10, 6))
@@ -47,7 +46,7 @@ def plot_time_scores(csv_path: str) -> None:
         markers={True: 'X', False: 'o'},
         sizes=50,  # Adjusted sizes for smaller dots
         alpha=0.6
-    )   
+    )    
 
     # Adding the 50-point rolling average line to the plot
     sns.lineplot(x=df.index, y=df['rolling_avg'], color='blue', label='50-pt Rolling Avg')  
@@ -70,11 +69,11 @@ def plot_time_scores(csv_path: str) -> None:
     # Get current date
     today = datetime.today()
     formatted_date = today.strftime("%d-%m-%y")
-    plt.savefig("/Users/justinlee/Documents/projport/s9-quant/heatmaps/"+f"scatter-upto-{df.index[-1]}-{formatted_date}", dpi=300)
+    plt.savefig("heatmaps/"+f"scatter-upto-{df.index[-1]}-{formatted_date}", dpi=300)
 
     # SHOW
     # plt.show()
 
 if __name__ == "__main__":
-    csv_path = '/Users/justinlee/Documents/projport/s9-quant/data.csv'
+    csv_path = 'data.csv'
     plot_time_scores(csv_path)
