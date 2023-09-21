@@ -33,6 +33,7 @@ import re
 import csv
 import time
 import pandas as pd
+from math import ceil
 
 csv_path = 'data.csv'
 
@@ -228,24 +229,25 @@ def draw_line(stdscr, y, x, l):
         stdscr.addch(y, x+l, curses.ACS_RTEE) 
 
 def draw_home(stdscr):
-    # Set up TUI 
-    stdscr.clear()
-    draw_box(stdscr, 0, 0, 25, 60)
-
-    '''
-    # Draws the garden, cat home screen
-    k=7 # start line
-    for line in garden_str.split('\n'): 
-        stdscr.addstr(k, 4, (line)) 
-        k+=1
-    '''
-
-    draw_line(stdscr, 4, 1, 59)
-    stdscr.addstr(0, 2, " ζ-ZetaMatrix ", curses.A_STANDOUT)
-    stdscr.refresh()
+    
 
     # Start zeta-matrix
     while True: 
+        # Set up TUI 
+        stdscr.clear()
+        draw_box(stdscr, 0, 0, 25, 60)
+
+        '''
+        # Draws the garden, cat home screen
+        k=7 # start line
+        for line in garden_str.split('\n'): 
+            stdscr.addstr(k, 4, (line)) 
+            k+=1
+        '''
+
+        draw_line(stdscr, 4, 1, 59)
+        stdscr.addstr(0, 2, " ζ-ZetaMatrix ", curses.A_STANDOUT)
+        stdscr.refresh()            
         show_stats(stdscr)
         curses.curs_set(0)  # Hide the cursor
 
@@ -276,26 +278,119 @@ def draw_home(stdscr):
             elif key in [curses.KEY_ENTER, ord('\n')]:
                 if current_index == 0: 
                     stdscr.addstr(2, 5, "                                                  ")
-                    play_zeta(stdscr)
+                    play_zeta_prac(stdscr)
                 elif current_index == 1: 
-                    pass
+                    stdscr.addstr(2, 5, "                                                  ")
+                    play_zeta(stdscr, game_time=60)
                 break
         
-def play_zeta(stdscr, ranked=False, game_time=0):
+def play_zeta(stdscr, game_time, ranked=False):
     # Implement: typing speed test. Need to identify when they've figured it out and the only limitation is typing speed - 
     # Waits for '_' space to start 
-    # 1 second pause and then the first question 
+    # 1 second pause and then the first question
+    stdscr.addstr(0, 17, " Timed ", curses.A_STANDOUT)
+    timeout_duration = 100
+    stdscr.timeout(timeout_duration)
+    curses.curs_set(0)
     appender = CSVAppender()
     stdscr.addstr(2, 15, " Ready? ")
     stdscr.refresh()
-    time.sleep(0.75)
+    time.sleep(1)
+    elapsed_time = 0
+    time_left = True
+    score = 0
+    start_time = time.time()
+    while time_left: 
+        time_recent = time.time()
+        got_wrong = False
+        answer_str = ''
+        
+        # Assuming generate_question() returns num1, oper, num2 in that order.
+        num1, oper, num2 = generate_question()
+        question = f"{num1} {oper_dict[oper]} {num2}"
+        ans = eval(f"{num1} {oper} {num2}")
+
+        stdscr.addstr(2, 15, f"> {question} =      ")
+        stdscr.move(2, 20 + len(question))
+        
+        while True: 
+            stdscr.addstr(2, 3, f"⏲: {ceil(game_time - elapsed_time)}s  ") 
+            stdscr.refresh()
+            elapsed_time = time.time() - start_time
+            if elapsed_time >= game_time:
+                time_left = False
+                break  # Exit inner while loop
+
+            key = stdscr.getch()
+
+            if key == -1: 
+                pass
+            elif key == curses.KEY_ENTER or key == 10 or key == 13:
+                pass
+            elif key in [curses.KEY_BACKSPACE, ord('\b'), ord('\x7f')]:
+                if len(answer_str) > 0:
+                    answer_str = answer_str[:-1]
+                    stdscr.addstr(2, 20 + len(question) + len(answer_str), ' ')
+                    stdscr.refresh()
+            elif len(answer_str) + 1 < 10 and (chr(key).isdigit() or chr(key) in ['-', '.']):
+                answer_str += chr(key)
+            
+            stdscr.addstr(2, 20 + len(question), answer_str)
+            stdscr.refresh()
+            
+            # Check whether the answer is correct 
+            try:
+                if int(answer_str) == 9999:
+                    appender.close()
+                    stdscr.addstr(1, 40, "               ")
+                    stdscr.addstr(2, 5, "                                                  ")
+                    return
+                
+                if int(answer_str) == ans:
+                    score += 1
+                    time_taken = round(time.time() - time_recent, 3)
+                    if time_taken < 90:  # Anything over 90 seconds is considered errenous (sorry)
+                        appender.append(time.time(), num1, oper, num2, time_taken, got_wrong, ranked, game_time)
+                    # Print to screen for diagnostics
+                    
+                    # stdscr.addstr(1, 59, f"⏲")
+
+                    stdscr.refresh()
+                    time_recent = time.time()
+                    break  # Go to the next question
+                if len(answer_str) >= len(str(ans)):
+                    got_wrong = True
+
+                
+
+            except ValueError:
+                continue 
+    
+    stdscr.addstr(1, 40, "               ")
+    stdscr.addstr(2, 2, "                                                  ")
+    stdscr.addstr(2, 10, f"Score: {score}")
+    stdscr.refresh()
+    stdscr.getch()
+    curses.curs_set(1)
+    return 
+
+def play_zeta_prac(stdscr, ranked=False, game_time=0):
+    # Implement: typing speed test. Need to identify when they've figured it out and the only limitation is typing speed - 
+    # Waits for '_' space to start 
+    # 1 second pause and then the first question 
+    stdscr.addstr(0, 17, " Practice ", curses.A_STANDOUT)
+    appender = CSVAppender()
+    stdscr.addstr(2, 15, " Ready? ")
+    stdscr.refresh()
+    time.sleep(1)
     
     score = 0
     # Make cursor visible
-    curses.curs_set(2)    
+    curses.curs_set(0)    
     while True: 
         time_recent = time.time()
         got_wrong = False
+        stdscr.addstr(1, 40, f"Score: {score}")
         stdscr.addstr(1, 40, f"Score: {score}")
         answer_str = ''
         
