@@ -30,7 +30,7 @@ def plot_time_scores(csv_path: str) -> None:
     #df['zscore_time'] = zscore(df['transformed_time'])
 
     # Compute 50 wide rolling average
-    df['rolling_avg'] = df['log_time'].rolling(window=100, min_periods=1).mean()
+    df['rolling_avg'] = df['log_time'].rolling(window=100, min_periods=50).mean()
     
     # Map colors based on whether the answer was correct or wrong
     colours = df['got_wrong'].map({True: 'red', False: 'green'}) 
@@ -75,5 +75,5 @@ def plot_time_scores(csv_path: str) -> None:
     # plt.show()
 
 if __name__ == "__main__":
-    csv_path = 'data.csv'
+    csv_path = str(input("Enter the name of the csv file: ")) + '.csv'
     plot_time_scores(csv_path)

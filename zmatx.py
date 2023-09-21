@@ -229,21 +229,11 @@ def draw_line(stdscr, y, x, l):
         stdscr.addch(y, x+l, curses.ACS_RTEE) 
 
 def draw_home(stdscr):
-    
-
     # Start zeta-matrix
     while True: 
         # Set up TUI 
         stdscr.clear()
         draw_box(stdscr, 0, 0, 25, 60)
-
-        '''
-        # Draws the garden, cat home screen
-        k=7 # start line
-        for line in garden_str.split('\n'): 
-            stdscr.addstr(k, 4, (line)) 
-            k+=1
-        '''
 
         draw_line(stdscr, 4, 1, 59)
         stdscr.addstr(0, 2, " ζ-ZetaMatrix ", curses.A_STANDOUT)
@@ -282,7 +272,10 @@ def draw_home(stdscr):
                 elif current_index == 1: 
                     stdscr.addstr(2, 5, "                                                  ")
                     play_zeta(stdscr, game_time=60)
-                break
+                elif current_index == 2: 
+                    stdscr.addstr(2, 5, "                                                  ")
+                    play_zeta(stdscr, game_time=120)
+                break # Reset home screen 
         
 def play_zeta(stdscr, game_time, ranked=False):
     # Implement: typing speed test. Need to identify when they've figured it out and the only limitation is typing speed - 
@@ -370,8 +363,11 @@ def play_zeta(stdscr, game_time, ranked=False):
     stdscr.addstr(2, 2, "                                                  ")
     stdscr.addstr(2, 10, f"Score: {score}")
     stdscr.refresh()
-    stdscr.getch()
     curses.curs_set(1)
+    while True: 
+        key = stdscr.getch()
+        if key == ord(' '):  # Check if the key is the space bar
+            return 
     return 
 
 def play_zeta_prac(stdscr, ranked=False, game_time=0):
