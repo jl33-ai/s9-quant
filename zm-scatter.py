@@ -30,7 +30,7 @@ def plot_time_scores(csv_path: str) -> None:
     #df['zscore_time'] = zscore(df['transformed_time'])
 
     # Compute 50 wide rolling average
-    df['rolling_avg'] = df['log_time'].rolling(window=100, min_periods=50).mean()
+    df['rolling_avg'] = df['log_time'].rolling(window=200, min_periods=50).mean()
     
     # Map colors based on whether the answer was correct or wrong
     colours = df['got_wrong'].map({True: 'red', False: 'green'}) 
@@ -44,7 +44,7 @@ def plot_time_scores(csv_path: str) -> None:
         palette={True: 'red', False: 'green'},
         style=df['got_wrong'],
         markers={True: 'X', False: 'o'},
-        sizes=50,  # Adjusted sizes for smaller dots
+        sizes=10,  # Adjusted sizes for smaller dots
         alpha=0.6
     )    
 

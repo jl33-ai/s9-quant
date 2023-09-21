@@ -114,6 +114,10 @@ Using statistics, 99% can be filled with just 10 users
 - [ ] Add WPM thing
 - [ ] 'SAved' icon
 - [ ] A chill practice mode and a 5 minute mode and a rnanked mode. 
+- [ ] https://www.asciiart.eu/art-and-design/patterns
+- [ ] 'How quickly can you fill up this grid' so it's like how quickly can you get to 100 (inverse) 
+  - Maybe like some stickman-esque shit. 
+  - simple mathletics game
 
 ### Things I expect to see from the ZetaMatrix Data
 - (when I realised I was truly grateful that I found data science as my craft - the dotplot)

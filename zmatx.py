@@ -126,6 +126,14 @@ class CSVAppender:
         except Exception as e:
             return "0", "0"
         
+    def best_worst(self, recent):
+        try: 
+            df = pd.read_csv(self.filename)
+            df = df.tail(recent)
+
+        except Exception as e: 
+            return [(0, 0), (0, 0)]
+
     def create_zm(self):
 
         # Filter the DataFrame based on operation
@@ -348,12 +356,15 @@ def play_zeta(stdscr, game_time, ranked=False):
     appender = CSVAppender()
     stdscr.addstr(2, 26, " Ready? ")
     stdscr.refresh()
-    time.sleep(1)
+    
     elapsed_time = 0
+    fastest_time = ('n/a', 99999)
+    slowest_time = ('n/a', 0)
     time_left = True
     score = 0
     start_time = time.time()
     stdscr.addstr(2, 22, "            ")
+    time.sleep(1)
     while time_left: 
         time_recent = time.time()
         got_wrong = False
@@ -396,11 +407,13 @@ def play_zeta(stdscr, game_time, ranked=False):
                 if int(answer_str) == ans:
                     score += 1
                     time_taken = round(time.time() - time_recent, 3)
-                    if time_taken < 90:  # Anything over 90 seconds is considered errenous (sorry)
-                        appender.append(time.time(), num1, oper, num2, time_taken, got_wrong, ranked, game_time)
-                    # Print to screen for diagnostics
+                    if time_taken < fastest_time[1]: 
+                        fastest_time = (question + ' = ' + str(ans), time_taken)
+                    if time_taken > slowest_time[1]: 
+                        slowest_time = (question + ' = ' + str(ans), time_taken)
                     
-                    # stdscr.addstr(1, 59, f"⏲")
+                    appender.append(time.time(), num1, oper, num2, time_taken, got_wrong, ranked, game_time)
+                    
 
                     stdscr.refresh()
                     time_recent = time.time()
@@ -413,10 +426,12 @@ def play_zeta(stdscr, game_time, ranked=False):
     appender.close()
     stdscr.addstr(1, 40, "               ")
     stdscr.addstr(2, 2, "                                                  ")
-    stdscr.addstr(2, 10, f"Score: {score}")
-    stdscr.addstr(3, 10, f"Press space (⎵) to exit")
-    stdscr.addstr(2, 20, f"Fastest: ")
-    stdscr.addstr(2, 20, f"Fastest: ")
+    stdscr.addstr(2, 4, f"Score: {score}", curses.color_pair(3))
+    stdscr.addstr(3, 4, f"Exit (⎵)", curses.A_BLINK)
+    stdscr.addstr(2, 23, f"Fastest: {fastest_time[0]}", curses.A_DIM)
+    stdscr.addstr(3, 23, f"Slowest: {slowest_time[0]}", curses.A_DIM)
+    stdscr.addstr(2, 50, f"| {fastest_time[1]}s")
+    stdscr.addstr(3, 50, f"| {slowest_time[1]}s")
     stdscr.refresh()
     #curses.curs_set(1)
     while True: 
@@ -513,7 +528,7 @@ def main(stdscr):
     # Initialize color support
     curses.start_color()
     
-    # Initialize color pairs (Foreground: White, Background: Black)
+    # Initialize color pairs (Foreground, Background)
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
     curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_WHITE)  
     curses.init_pair(3, curses.COLOR_RED, curses.COLOR_WHITE) 
