@@ -1,0 +1,6 @@
+timestamp,num1,operator,num2,timetaken,got_wrong,timed
+1695278751.457224,98,-,21,9.717,False,False,60
+1695278786.334033,546,/,7,34.877,True,False,60
+1695278822.995617,72,-,5,4.486,False,False,120
+1695278833.983894,384,/,4,10.988,False,False,120
+1695278840.0923562,295,/,5,6.108,False,False,120

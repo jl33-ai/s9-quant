@@ -108,6 +108,12 @@ Using statistics, 99% can be filled with just 10 users
 - [ ] Induced learning curve; if it took x2 longer than the users E[S], then start to drill it, and plot the learning curve for a single question combination 
 - [ ] Timed column - indicating if the user started a 120s timed blitz. 
 - [ ] Track typing speed - how. 
+- [ ] Show your delta speed change. 
+- [ ] Loading brain matrix TUI type shit. 
+- [ ] It needs ONE smart addictive factor, so that the game gets popular and i get more data. 
+- [ ] Add WPM thing
+- [ ] 'SAved' icon
+- [ ] A chill practice mode and a 5 minute mode and a rnanked mode. 
 
 ### Things I expect to see from the ZetaMatrix Data
 - (when I realised I was truly grateful that I found data science as my craft - the dotplot)
@@ -118,6 +124,8 @@ Using statistics, 99% can be filled with just 10 users
 - Rate of 'mistakes' (which could be poisson), should gradually decline. 
 - As the num1/num2 get larger, the circles shouldget darker indicating more thinking time
 - Factors: - ??? - study: get to 100 as fast as possible or do as many in 2 mins. And some others factor. 5 min session threshold. Factors are typing speed. Could you pick out the moment I realised the / 11 trick. 12’s are hard. 
+- PRAYING for something poisson (rewatch the 'umh' video)
+
 
 ### Data Inference ideas 
 `1, 2, 4, and 8 primarily` 
@@ -127,6 +135,9 @@ Using statistics, 99% can be filled with just 10 users
 - This is another feature 
 - See the moment I learnt the /11 trick
 - Even though everyone is on a spectrum, from me to Terry (cracked fast) we want to see if their RELATIVE speeds are the same; i.e no matter the general speed, does everyone find take twice as long to do ? x 12 
+- **Tougher inferences**
+  - Measure the extent to which you get 'thrown off' by a losing streak / bad and long ones
+  - For a 120s game, the variance the is attributable to your performance, and the variance that is due to the relative hardness of the question (which I need a way to quantify, find a distribution of... I need a lot of data in other words) - *This I guess is the real question* 
 
 1. **Rate of Improvement**: By tracking a user's performance over time, you can visualize their learning curve. Some users might show rapid initial improvement followed by a plateau, while others might demonstrate steady incremental improvement. This could reflect different learning styles and strategies.
 
@@ -148,6 +159,8 @@ Using statistics, 99% can be filled with just 10 users
 
 #### Moment when James X taught me / 11:
 ![Moment when James X taught me / 11](heatmaps/image.png)
+
+#### Moment when I did my fully subconscious one (the equation didn't even reach my prefrontal cortex, kind of like how you jerk your arm away before you ever register the hot pan). Like I didn't even consciously SEE the question. But it was gone. 
 
 
 Error:

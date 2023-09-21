@@ -35,7 +35,7 @@ import time
 import pandas as pd
 from math import ceil
 
-csv_path = 'data.csv'
+csv_path = '/Users/justinlee/Documents/projport/s9-quant/data.csv'
 
 garden_str = """     `!,
     -( )-
@@ -52,6 +52,39 @@ garden_str = """     `!,
       #\#}#} }}{@  @       [___][]
       ##\/## }}{|@@|/      [_][__]
 ,ejm,,,,}{,,,}{{||||_______[___][]"""
+pattern0_str = """\`._`--','    )   o `.    <       :     \  ( ( ,. \  \\
+\\\  `-,'     /  ,-.___`-.  :      |      \  \ `' ) )  \
+\\     |      |  `-.   `-'  |     ,'-._   \`._`--','    )   o
+ \     :       >    `. o   (    ,',--. `.\\\  `-,'     /  ,-.
+  )   o `.    <       :     \  ( ( ,. \  \\     |      |  `-.
+ /  ,-.___`-.  :      |      \  \ `' ) )  \     :       >
+ |  `-.   `-'  |     ,'-._   \`._`--','    )   o `.    <
+  >    `. o   (    ,',--. `.\\\  `-,'     /  ,-.___`-.  :
+ <       :     \  ( ( ,. \  \\     |      |  `-.   `-'  |
+  :      |      \  \ `' ) )  \     :       >    `. o   (    ,
+  |     ,'-._   \`._`--','    )   o `.    <       :     \  (
+ (    ,',--. `.\\\  `-,'     /  ,-.___`-.  :      |      \  \
+  \  ( ( ,. \  \\     |      |  `-.   `-'  |     ,'-._   \`._
+   \  \ `' ) )  \     :       >    `. o   (    ,',--. `.\\\
+   \`._`--','    )   o `.    <       :     \  ( ( ,. \  \\
+`.\\\  `-,'     /  ,-.___`-.  :      |      \  \ `' ) )  \
+  \\     |      |  `-.   `-'  |     ,'-._   \`._`--','    )
+)  \     :       >    `. o   (    ,',--. `.\\\  `-,'     /  ,
+    )   o `.    <       :     \  ( ( ,. \  \\     |      |  `
+   /  ,-.___`-.  :      |      \  \ `' ) )  \     :       >
+   |  `-.   `-'  |     ,'-._   \`._`--','    )   o `.    <
+    >    `. o   (    ,',--. `.\\\  `-,'     /  ,-.___`-.  :
+   <       :     \  ( ( ,. \  \\     |      |  `-.   `-'  |
+-.  :      |      \  \ `' ) )  \     :       >    `. o   (
+-'  |     ,'-._   \`._`--','    )   o `.    <       :     \
+   (    ,',--. `.\\\  `-,'     /  ,-.___`-.  :      |      \
+    \  ( ( ,. \  \\     |      |  `-.   `-'  |     ,'-._   \`
+     \  \ `' ) )  \     :       >    `. o   (    ,',--. `.\\\
+._   \`._`--','    )   o `.    <       :     \  ( ( ,. \  \\
+. `.\\\  `-,'     /  ,-.___`-.  :      |      \  \ `' ) )  \
+ \  \\     |      |  `-.   `-'  |     ,'-._   \`._`--','    )
+) )  \     :       >    `. o   (    ,',--. `.\\\  `-,'-hrr-/"""
+
 # × ÷
 oper_dict = {'+': '+', '-': '-', '*': '×', '/': '÷'}
 
@@ -78,7 +111,7 @@ class CSVAppender:
             
             # Check if dataframe is empty or the column 'timetaken' is not present
             if df.empty or 'timetaken' not in df.columns:
-                return "n/a", "n/a"
+                return "0", "0"
             
             df = df.tail(200)
 
@@ -91,7 +124,7 @@ class CSVAppender:
             return exp, std
 
         except Exception as e:
-            return "n/a", "n/a"
+            return "0", "0"
         
     def create_zm(self):
 
@@ -130,6 +163,7 @@ class Button:
         win.addstr(y, x, "[ " + self.text + " ]")
         if self.selected:
             win.attroff(curses.A_REVERSE)
+
 
 def show_stats(stdscr): 
     """
@@ -228,16 +262,39 @@ def draw_line(stdscr, y, x, l):
         stdscr.addch(y, x-1, curses.ACS_LTEE) 
         stdscr.addch(y, x+l, curses.ACS_RTEE) 
 
+def render_ascii(stdscr, ascii_str):
+    s=1
+    for line in ascii_str.split('\n'):
+        if s <= 18: 
+            stdscr.addstr(5+s, 2, line[:56])
+            s += 1
+
+def draw_focus(stdscr):
+    draw_box(stdscr, 5, 1, 19, 57)
+    stdscr.addstr(5, 2, " Scene ", curses.A_BOLD)
+
+    render_ascii(stdscr, pattern0_str)
+    return
+
+def draw_garden(stdscr):
+    draw_box(stdscr, 5, 1, 19, 57)
+    stdscr.addstr(5, 2, " Scene ", curses.A_BOLD)
+
+    # Render
+    render_ascii(stdscr, garden_str)
+    return 
+
+def draw_tui(stdscr):
+    draw_box(stdscr, 0, 0, 25, 60)
+    draw_line(stdscr, 4, 1, 59)
+    stdscr.addstr(0, 2, " ζ-ZetaMatrix ", curses.A_STANDOUT)   
+
 def draw_home(stdscr):
     # Start zeta-matrix
     while True: 
         # Set up TUI 
         stdscr.clear()
-        draw_box(stdscr, 0, 0, 25, 60)
-
-        draw_line(stdscr, 4, 1, 59)
-        stdscr.addstr(0, 2, " ζ-ZetaMatrix ", curses.A_STANDOUT)
-        stdscr.refresh()            
+        draw_tui(stdscr)
         show_stats(stdscr)
         curses.curs_set(0)  # Hide the cursor
 
@@ -281,18 +338,22 @@ def play_zeta(stdscr, game_time, ranked=False):
     # Implement: typing speed test. Need to identify when they've figured it out and the only limitation is typing speed - 
     # Waits for '_' space to start 
     # 1 second pause and then the first question
+    stdscr.clear()
+    draw_tui(stdscr)
+    draw_focus(stdscr)
     stdscr.addstr(0, 17, " Timed ", curses.A_STANDOUT)
     timeout_duration = 100
     stdscr.timeout(timeout_duration)
     curses.curs_set(0)
     appender = CSVAppender()
-    stdscr.addstr(2, 15, " Ready? ")
+    stdscr.addstr(2, 26, " Ready? ")
     stdscr.refresh()
     time.sleep(1)
     elapsed_time = 0
     time_left = True
     score = 0
     start_time = time.time()
+    stdscr.addstr(2, 22, "            ")
     while time_left: 
         time_recent = time.time()
         got_wrong = False
@@ -303,8 +364,7 @@ def play_zeta(stdscr, game_time, ranked=False):
         question = f"{num1} {oper_dict[oper]} {num2}"
         ans = eval(f"{num1} {oper} {num2}")
 
-        stdscr.addstr(2, 15, f"> {question} =      ")
-        stdscr.move(2, 20 + len(question))
+        stdscr.addstr(2, 22, f"> {question} =      ")
         
         while True: 
             stdscr.addstr(2, 3, f"⏲: {ceil(game_time - elapsed_time)}s  ") 
@@ -323,22 +383,16 @@ def play_zeta(stdscr, game_time, ranked=False):
             elif key in [curses.KEY_BACKSPACE, ord('\b'), ord('\x7f')]:
                 if len(answer_str) > 0:
                     answer_str = answer_str[:-1]
-                    stdscr.addstr(2, 20 + len(question) + len(answer_str), ' ')
+                    stdscr.addstr(2, 27 + len(question) + len(answer_str), ' ')
                     stdscr.refresh()
             elif len(answer_str) + 1 < 10 and (chr(key).isdigit() or chr(key) in ['-', '.']):
                 answer_str += chr(key)
             
-            stdscr.addstr(2, 20 + len(question), answer_str)
+            stdscr.addstr(2, 27 + len(question), answer_str)
             stdscr.refresh()
             
             # Check whether the answer is correct 
-            try:
-                if int(answer_str) == 9999:
-                    appender.close()
-                    stdscr.addstr(1, 40, "               ")
-                    stdscr.addstr(2, 5, "                                                  ")
-                    return
-                
+            try:                
                 if int(answer_str) == ans:
                     score += 1
                     time_taken = round(time.time() - time_recent, 3)
@@ -354,16 +408,17 @@ def play_zeta(stdscr, game_time, ranked=False):
                 if len(answer_str) >= len(str(ans)):
                     got_wrong = True
 
-                
-
             except ValueError:
                 continue 
-    
+    appender.close()
     stdscr.addstr(1, 40, "               ")
     stdscr.addstr(2, 2, "                                                  ")
     stdscr.addstr(2, 10, f"Score: {score}")
+    stdscr.addstr(3, 10, f"Press space (⎵) to exit")
+    stdscr.addstr(2, 20, f"Fastest: ")
+    stdscr.addstr(2, 20, f"Fastest: ")
     stdscr.refresh()
-    curses.curs_set(1)
+    #curses.curs_set(1)
     while True: 
         key = stdscr.getch()
         if key == ord(' '):  # Check if the key is the space bar
@@ -371,23 +426,26 @@ def play_zeta(stdscr, game_time, ranked=False):
     return 
 
 def play_zeta_prac(stdscr, ranked=False, game_time=0):
+    stdscr.clear()
+    draw_tui(stdscr)
+    draw_garden(stdscr)
     # Implement: typing speed test. Need to identify when they've figured it out and the only limitation is typing speed - 
     # Waits for '_' space to start 
     # 1 second pause and then the first question 
     stdscr.addstr(0, 17, " Practice ", curses.A_STANDOUT)
     appender = CSVAppender()
-    stdscr.addstr(2, 15, " Ready? ")
+    stdscr.addstr(2, 26, " Ready? ")
     stdscr.refresh()
     time.sleep(1)
-    
+    stdscr.addstr(2, 47, f"(⎵) to exit")
+    stdscr.addstr(2, 25, "         ")
     score = 0
     # Make cursor visible
     curses.curs_set(0)    
     while True: 
         time_recent = time.time()
         got_wrong = False
-        stdscr.addstr(1, 40, f"Score: {score}")
-        stdscr.addstr(1, 40, f"Score: {score}")
+        stdscr.addstr(1, 50, f"Score: {score}")
         answer_str = ''
         
         # Assuming generate_question() returns num1, oper, num2 in that order.
@@ -395,36 +453,33 @@ def play_zeta_prac(stdscr, ranked=False, game_time=0):
         question = f"{num1} {oper_dict[oper]} {num2}"
         ans = eval(f"{num1} {oper} {num2}")
 
-        stdscr.addstr(2, 15, f"> {question} =      ")
-        stdscr.move(2, 20 + len(question))
+        stdscr.addstr(2, 22, f"> {question} =      ")
         stdscr.refresh()
         
         while True: 
             elapsed_time = time.time() - time_recent
 
             key = stdscr.getch()
-
-            if key == curses.KEY_ENTER or key == 10 or key == 13:
-                pass
+                
+            if key == ord(' '):
+                appender.close()
+                stdscr.addstr(1, 40, "               ")
+                stdscr.addstr(2, 5, "                                                  ")
+                return
+            
             elif key in [curses.KEY_BACKSPACE, ord('\b'), ord('\x7f')]:
                 if len(answer_str) > 0:
                     answer_str = answer_str[:-1]
-                    stdscr.addstr(2, 20 + len(question) + len(answer_str), ' ')
+                    stdscr.addstr(2, 27 + len(question) + len(answer_str), ' ')
                     stdscr.refresh()
             elif len(answer_str) + 1 < 10 and (chr(key).isdigit() or chr(key) in ['-', '.']):
                 answer_str += chr(key)
             
-            stdscr.addstr(2, 20 + len(question), answer_str)
+            stdscr.addstr(2, 27 + len(question), answer_str)
             stdscr.refresh()
             
             # Check whether the answer is correct 
             try:
-                if int(answer_str) == 9999:
-                    appender.close()
-                    stdscr.addstr(1, 40, "               ")
-                    stdscr.addstr(2, 5, "                                                  ")
-                    return
-                
                 if int(answer_str) == ans:
                     score += 1
                     time_taken = round(time.time() - time_recent, 3)

@@ -60,6 +60,8 @@ def plot_time_scores(csv_path: str) -> None:
     plt.title('Time Scores Distribution Over Time Based on Correctness')
     plt.grid(True, which="both", ls="--", c='0.7')  # Adding a grid for better readability
     plt.legend(title='First try', loc='upper right', labels=['Yes', 'No'])
+    plt.axhline(y=1, color='yellow', linestyle='--')
+    plt.text(1, 2, 'e seconds per question')
 
     # Adjust layout
     plt.tight_layout()
@@ -69,7 +71,8 @@ def plot_time_scores(csv_path: str) -> None:
     # Get current date
     today = datetime.today()
     formatted_date = today.strftime("%d-%m-%y")
-    plt.savefig("heatmaps/"+f"scatter-upto-{df.index[-1]}-{formatted_date}", dpi=300)
+    plt.savefig(f"scatter-upto-{df.index[-1]}-{formatted_date}", dpi=300)
+    print('Plot created and saved')
 
     # SHOW
     # plt.show()
