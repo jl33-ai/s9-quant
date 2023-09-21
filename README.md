@@ -4,7 +4,7 @@
 
 ---
 
-<img width="450" alt="image" src="https://github.com/jl33-ai/s9-quant/assets/127172022/04ce2506-d153-4c73-acbf-a0b9a8dff3cf">
+<img width="450" alt="image" src="https://github.com/jl33-ai/s9-quant/assets/127172022/f3228438-b340-4381-9227-7aaf2e0fe899">
 <img width = "450" alt="image" src="https://github.com/jl33-ai/s9-quant/blob/main/heatmaps/scatter-upto-837-20-09-23.png">
 <img width = "450" alt="image" src="https://github.com/jl33-ai/s9-quant/blob/main/heatmaps/zetamatrix-355--.png">
 
