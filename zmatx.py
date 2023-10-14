@@ -34,8 +34,11 @@ import csv
 import time
 import pandas as pd
 from math import ceil
+import subprocess
 
-csv_path = '/Users/justinlee/Documents/projport/s9-quant/data.csv'
+
+
+csv_path = '/Users/justinlee/Documents/projport/s9-quant/new_data.csv'
 
 garden_str = """     `!,
     -( )-
@@ -84,6 +87,29 @@ pattern0_str = """\`._`--','    )   o `.    <       :     \  ( ( ,. \  \\
 . `.\\\  `-,'     /  ,-.___`-.  :      |      \  \ `' ) )  \
  \  \\     |      |  `-.   `-'  |     ,'-._   \`._`--','    )
 ) )  \     :       >    `. o   (    ,',--. `.\\\  `-,'-hrr-/"""
+dojo_str = """   `,.      .   .        *   .    .      .  _    ..          .
+     \,~-.         *           .    .       ))       *    .
+          \ *          .   .   |    *  . .  ~    .      .  .  ,
+ ,           `-.  .            :               *           ,-
+  -             `-.        *._/_\_.       .       .   ,-'
+  -                 `-_.,     |n|     .      .       ;
+    -                    \ ._/_,_\_.  .          . ,'         ,
+     -                    `-.|.n.|      .   ,-.__,'         -
+      -                   ._/_,_,_\_.    ,-'              -
+      -                     |..n..|-`'-'                -
+       -                 ._/_,_,_,_\_.                 -
+         -               ,-|...n...|                  -
+           -         ,-'._/_,_,_,_,_\_.              -
+             -  ,-=-'     |....n....|              -
+              -;       ._/_,_,_,_,_,_\_.         -
+             ,-          |.....n.....|          -
+           ,;         ._/_,_,_,_,_,_,_\_.         -
+  `,  '.  `.  ".  `,  '.| n   ,-.   n |  ",  `.  `,  '.  `,  ',
+,.:;..;;..;;.,:;,.;:,o__|__o !.|.! o__|__o;,.:;.,;;,,:;,.:;,;;:
+ ][  ][  ][  ][  ][  |_i_i_H_|_|_|_H_i_i_|  ][  ][  ][  ][  ][
+                     |     //=====\\     |
+                     |____//=======\\____|"""
+
 
 # × ÷
 oper_dict = {'+': '+', '-': '-', '*': '×', '/': '÷'}
@@ -97,10 +123,10 @@ class CSVAppender:
         # Check if the file already has content
         # If not, write headers
         if self.file.tell() == 0:
-            self.writer.writerow(["timestamp", "num1", "operator", "num2", "timetaken", "got_wrong", "timed"])
+            self.writer.writerow(["timestamp", "num1", "operator", "num2", "timetaken", "got_wrong", "timed", "key_strokes", "wrong_ans"])
 
-    def append(self, timestamp, num1, operator, num2, timetaken, got_wrong, ranked, game_time):
-        self.writer.writerow([timestamp, num1, operator, num2, timetaken, got_wrong, ranked, game_time])
+    def append(self, timestamp, num1, operator, num2, timetaken, got_wrong, ranked, game_time, key_strokes, wrong_ans):
+        self.writer.writerow([timestamp, num1, operator, num2, timetaken, got_wrong, ranked, game_time, key_strokes, wrong_ans])
         # If you want to ensure data is written immediately (not buffered), uncomment next line:
         # self.file.flush()
 
@@ -198,6 +224,10 @@ def show_stats(stdscr):
     stdscr.addstr(7, 12, f"{exp}s     ")
     stdscr.addstr(8, 12, f"{std}s     ")
 
+    # Finesse: complement of number of backspaces per question 
+
+    # React time: 10 quickest ones
+
 
     stdscr.addstr(10, 54, " ᓚᘏᗢ ")
 
@@ -242,6 +272,23 @@ def generate_question(decimals = False):
             num1 = product
 
     return num1, oper, num2
+
+def generate_number():
+    #60% double
+    #25% single
+    #15% triple
+    random.randint()
+
+    return num
+
+def resize_terminal(columns, rows):
+    script = f'''
+        tell application "Terminal"
+            set number of columns of front window to {columns}
+            set number of rows of front window to {rows}
+        end tell
+    '''
+    subprocess.run(["osascript", "-e", script])
 
 def draw_box(stdscr, y, x, height, width):
     h_max, w_max = stdscr.getmaxyx()
@@ -292,6 +339,14 @@ def draw_garden(stdscr):
     render_ascii(stdscr, garden_str)
     return 
 
+def draw_dojo(stdscr):
+    draw_box(stdscr, 5, 1, 19, 57)
+    stdscr.addstr(5, 2, " Scene ", curses.A_BOLD)
+
+    # Render
+    render_ascii(stdscr, dojo_str)
+    return 
+
 def draw_tui(stdscr):
     draw_box(stdscr, 0, 0, 25, 60)
     draw_line(stdscr, 4, 1, 59)
@@ -307,7 +362,7 @@ def draw_home(stdscr):
         curses.curs_set(0)  # Hide the cursor
 
         # Define the buttons
-        buttons = [Button("Practice"), Button("60s"), Button("120s"), Button("Ranked")]
+        buttons = [Button("Practice"), Button("60s"), Button("120s"), Button("5 mins")]
         buttons[0].selected = True  # The first button is selected initially
 
         current_index = 0
@@ -340,6 +395,10 @@ def draw_home(stdscr):
                 elif current_index == 2: 
                     stdscr.addstr(2, 5, "                                                  ")
                     play_zeta(stdscr, game_time=120)
+                elif current_index == 3: 
+                    stdscr.addstr(2, 5, "                                                  ")
+                    play_dojo(stdscr, game_time=120)
+                    
                 break # Reset home screen 
         
 def play_zeta(stdscr, game_time, ranked=False):
@@ -366,6 +425,8 @@ def play_zeta(stdscr, game_time, ranked=False):
     stdscr.addstr(2, 22, "            ")
     time.sleep(1)
     while time_left: 
+        key_strokes = []
+        wrong_ans = []
         time_recent = time.time()
         got_wrong = False
         answer_str = ''
@@ -391,12 +452,14 @@ def play_zeta(stdscr, game_time, ranked=False):
                 pass
             elif key == curses.KEY_ENTER or key == 10 or key == 13:
                 pass
-            elif key in [curses.KEY_BACKSPACE, ord('\b'), ord('\x7f')]:
+            elif key in [curses.KEY_BACKSPACE, ord('\b'), ord('\x7f')]: # flag keystroke
+                key_strokes.append(str(round(-(time.time()-time_recent),3))) # Negative for backspace 
                 if len(answer_str) > 0:
                     answer_str = answer_str[:-1]
                     stdscr.addstr(2, 27 + len(question) + len(answer_str), ' ')
                     stdscr.refresh()
-            elif len(answer_str) + 1 < 10 and (chr(key).isdigit() or chr(key) in ['-', '.']):
+            elif len(answer_str) + 1 < 10 and (chr(key).isdigit() or chr(key) in ['-', '.']): # flag keystroke
+                key_strokes.append(str(round(time.time()-time_recent,3)))
                 answer_str += chr(key)
             
             stdscr.addstr(2, 27 + len(question), answer_str)
@@ -404,6 +467,7 @@ def play_zeta(stdscr, game_time, ranked=False):
             
             # Check whether the answer is correct 
             try:                
+                # Correct
                 if int(answer_str) == ans:
                     score += 1
                     time_taken = round(time.time() - time_recent, 3)
@@ -411,14 +475,15 @@ def play_zeta(stdscr, game_time, ranked=False):
                         fastest_time = (question + ' = ' + str(ans), time_taken)
                     if time_taken > slowest_time[1]: 
                         slowest_time = (question + ' = ' + str(ans), time_taken)
-                    
-                    appender.append(time.time(), num1, oper, num2, time_taken, got_wrong, ranked, game_time)
-                    
-
+                    key_strokes_str = ",".join(key_strokes)
+                    wrong_ans_str = ",".join(wrong_ans)
+                    appender.append(time.time(), num1, oper, num2, time_taken, got_wrong, ranked, game_time, key_strokes_str, wrong_ans_str)
                     stdscr.refresh()
                     time_recent = time.time()
                     break  # Go to the next question
-                if len(answer_str) >= len(str(ans)):
+                if len(answer_str) >= len(str(ans)):  
+                    if answer_str not in wrong_ans:                 
+                        wrong_ans.append(answer_str)
                     got_wrong = True
 
             except ValueError:
@@ -427,7 +492,10 @@ def play_zeta(stdscr, game_time, ranked=False):
     stdscr.addstr(1, 40, "               ")
     stdscr.addstr(2, 2, "                                                  ")
     stdscr.addstr(2, 4, f"Score: {score}", curses.color_pair(3))
-    stdscr.addstr(3, 4, f"Exit (⎵)", curses.A_BLINK)
+    stdscr.addstr(3, 4, f"Exit ( ⎵ )", curses.A_BLINK)
+
+    stdscr.addstr(1, 23, f"Average: 20", curses.A_DIM)
+
     stdscr.addstr(2, 23, f"Fastest: {fastest_time[0]}", curses.A_DIM)
     stdscr.addstr(3, 23, f"Slowest: {slowest_time[0]}", curses.A_DIM)
     stdscr.addstr(2, 50, f"| {fastest_time[1]}s")
@@ -438,8 +506,7 @@ def play_zeta(stdscr, game_time, ranked=False):
         key = stdscr.getch()
         if key == ord(' '):  # Check if the key is the space bar
             return 
-    return 
-
+     
 def play_zeta_prac(stdscr, ranked=False, game_time=0):
     stdscr.clear()
     draw_tui(stdscr)
@@ -452,7 +519,7 @@ def play_zeta_prac(stdscr, ranked=False, game_time=0):
     stdscr.addstr(2, 26, " Ready? ")
     stdscr.refresh()
     time.sleep(1)
-    stdscr.addstr(2, 47, f"(⎵) to exit")
+    stdscr.addstr(2, 47, f"( ⎵ ) to exit")
     stdscr.addstr(2, 25, "         ")
     score = 0
     # Make cursor visible
@@ -524,6 +591,106 @@ def draw_zetaMatrix(stdscr, type='add'):
     # for _ in 
     return 
 
+def play_dojo(stdscr, game_time, ranked=False):
+    stdscr.clear()
+    draw_tui(stdscr)
+    draw_dojo(stdscr)
+    stdscr.addstr(0, 17, " Timed ", curses.A_STANDOUT)
+    timeout_duration = 100
+    stdscr.timeout(timeout_duration)
+    curses.curs_set(0)
+    appender = CSVAppender()
+    stdscr.addstr(2, 26, " Ready? ")
+    stdscr.refresh()
+    
+    elapsed_time = 0
+    fastest_time = ('n/a', 99999)
+    slowest_time = ('n/a', 0)
+    time_left = True
+    score = 0
+    start_time = time.time()
+    stdscr.addstr(2, 22, "            ")
+    time.sleep(1)
+    while time_left: 
+        time_recent = time.time()
+        answer_str = ''
+        
+        # Assuming generate_question() returns num1, oper, num2 in that order.
+        num1, oper, num2 = generate_question()
+        question = f"{num1} {oper_dict[oper]} {num2}"
+        ans = eval(f"{num1} {oper} {num2}")
+
+        stdscr.addstr(2, 22, f"> {question} =      ")
+        
+        while True: 
+            stdscr.addstr(2, 3, f"⏲: {ceil(game_time - elapsed_time)}s  ") 
+            stdscr.refresh()
+            elapsed_time = time.time() - start_time
+            if elapsed_time >= game_time:
+                time_left = False
+                break  # Exit inner while loop
+
+            key = stdscr.getch()
+
+            if key == -1: 
+                pass
+            elif key == curses.KEY_ENTER or key == 10 or key == 13:
+                pass
+            elif key in [curses.KEY_BACKSPACE, ord('\b'), ord('\x7f')]: # flag keystroke
+                key_strokes.append(str(round(-(time.time()-time_recent),3))) # Negative for backspace 
+                if len(answer_str) > 0:
+                    answer_str = answer_str[:-1]
+                    stdscr.addstr(2, 27 + len(question) + len(answer_str), ' ')
+                    stdscr.refresh()
+            elif len(answer_str) + 1 < 10 and (chr(key).isdigit() or chr(key) in ['-', '.']): # flag keystroke
+                key_strokes.append(str(round(time.time()-time_recent,3)))
+                answer_str += chr(key)
+            
+            stdscr.addstr(2, 27 + len(question), answer_str)
+            stdscr.refresh()
+            
+            # Check whether the answer is correct 
+            try:                
+                # Correct
+                if int(answer_str) == ans:
+                    score += 1
+                    time_taken = round(time.time() - time_recent, 3)
+                    if time_taken < fastest_time[1]: 
+                        fastest_time = (question + ' = ' + str(ans), time_taken)
+                    if time_taken > slowest_time[1]: 
+                        slowest_time = (question + ' = ' + str(ans), time_taken)
+                    key_strokes_str = ",".join(key_strokes)
+                    wrong_ans_str = ",".join(wrong_ans)
+                    appender.append(time.time(), num1, oper, num2, time_taken, got_wrong, ranked, game_time, key_strokes_str, wrong_ans_str)
+                    stdscr.refresh()
+                    time_recent = time.time()
+                    break  # Go to the next question
+                if len(answer_str) >= len(str(ans)):  
+                    if answer_str not in wrong_ans:                 
+                        wrong_ans.append(answer_str)
+                    got_wrong = True
+
+            except ValueError:
+                continue 
+    appender.close()
+    stdscr.addstr(1, 40, "               ")
+    stdscr.addstr(2, 2, "                                                  ")
+    stdscr.addstr(2, 4, f"Score: {score}", curses.color_pair(3))
+    stdscr.addstr(3, 4, f"Exit ( ⎵ )", curses.A_BLINK)
+
+    stdscr.addstr(1, 23, f"Average: 20", curses.A_DIM)
+
+    stdscr.addstr(2, 23, f"Fastest: {fastest_time[0]}", curses.A_DIM)
+    stdscr.addstr(3, 23, f"Slowest: {slowest_time[0]}", curses.A_DIM)
+    stdscr.addstr(2, 50, f"| {fastest_time[1]}s")
+    stdscr.addstr(3, 50, f"| {slowest_time[1]}s")
+    stdscr.refresh()
+    #curses.curs_set(1)
+    while True: 
+        key = stdscr.getch()
+        if key == ord(' '):  # Check if the key is the space bar
+            return 
+
 def main(stdscr):
     # Initialize color support
     curses.start_color()
@@ -536,18 +703,21 @@ def main(stdscr):
 
     # Apply the color pair to stdscr
     stdscr.bkgd(' ', curses.color_pair(1))  
+
+    # Attempt to resize
+    resize_terminal(62, 27)
     
     # Screen dimensions
-    h, w = 25, 60
+    h, w = 26, 61
     h_min, w_min = h, w
 
     # Screen sizing loop
     while True:
         stdscr.clear()
         h_curr, w_curr = stdscr.getmaxyx()
-        if h_curr <= h_min or w_curr <= w_min:
+        if h_curr < h_min or w_curr < w_min:
             # Show a live read of the screen size 
-            stdscr.addstr(0, 0, "Please resize the window to at least 25x60")
+            stdscr.addstr(0, 0, "Please resize the window to at least 26x61")
             stdscr.addstr(1, 0, f"Currently: {h_curr:3} x {w_curr:3}")
             stdscr.addstr(2, 0, "You may use ⌘- / ⌘+")
         else:
@@ -567,3 +737,6 @@ if __name__ == "__main__":
 
 
 # Refresht he screen buttonso beautiful. How do they do it. 
+
+
+# ignore first 3 of patricks 

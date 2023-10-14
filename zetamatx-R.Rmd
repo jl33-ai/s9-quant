@@ -1,0 +1,88 @@
+---
+title: "Zeta Matrix Experiment"
+output: html_notebook
+---
+
+Read in the data and remove extreme values
+
+```{r}
+z_data <- read.csv('new_data.csv')
+s <- z_data[ , 5]
+s1 <- s[s <= sd(s)*3]
+s9<-s[s <= sd(s)*3]
+```
+
+Some summary stats
+```{r}
+# Calculate the statistics
+stats <- data.frame(
+  Measure = c("Min", "1st Qu.", "Median", "Mean", "3rd Qu.", "Max", "Variance", "Standard Deviation"),
+  Value = c(summary(s1)[1], summary(s1)[2], summary(s1)[3], mean(s1), summary(s1)[4], summary(s1)[6], var(s1), sd(s1))
+)
+
+# Display as a table
+kable(stats, caption = "Summary Statistics of s1", align = "l")
+
+```
+
+Boxplot
+```{r}
+boxplot(s1, horizontal=TRUE)
+```
+
+Plot histogram of data with density kernel
+Influenced by
+- learning curve
+- distribution of relative question difficulty
+- human error 
+
+```{r}
+hist(s1, breaks = 100, freq = FALSE, xlab = "Times (s)", col = 8)
+smooth.density = density(s1)  # fits a smooth curve
+lines(smooth.density, lty = 1, lwd = 1, col = 2)  # draws the curve
+```
+
+Stripchart
+```{r}
+stripchart(s1, method="stack", pch=16, col=8, xlab="Times (s)", cex=0.2)
+```
+
+QQ-plot
+```{r}
+Finv <- function(p) {qexp(p)}
+s1 <- sort(s1)
+n <- length(s1)
+p <- (1:n-0.5)/n
+typ_samp <- Finv(p)
+
+plot(typ_samp, s1, 
+     xlab = 'Typical Sample',
+     ylab = 'Zetamatrix question times'
+   )
+
+fit <- lm(s1 ~ typ_samp)
+abline(fit, col='red')
+
+```
+
+
+Scatterplot of attempts over time
+```{r}
+index <- c(1:n)
+s2 <- log(s1)
+plot(index, s2, cex=0.1)
+```
+
+```{r }
+library(MASS)
+
+# Fit to a gamma 
+my_fit <- fitdistr(x = s1, densfun = dgamma,
+                       start = list(shape = 2, rate = 2))
+my_fit
+```
+```{r}
+# Plot data and fitted models
+hist(s1, breaks = 100, freq = FALSE, xlab = "Times (s)", col = 8)
+#curve(dgamma(x, shape=10, rate=0.2), from = 0, to = 100, col = 2, lty = 2, lwd = 2, add = TRUE)
+```

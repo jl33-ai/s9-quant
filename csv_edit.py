@@ -14,13 +14,10 @@ with open(filename, 'r') as file:
 
 # Step 3: Add the new "timed" column
 header, *data = rows
-header.append("time")
+header.append("key_strokes")
 
 for idx, row in enumerate(data, 1):  # Starting index from 1 to consider header
-    if idx >= 438 and idx <= 482:
-        row.append(120)
-    else:
-        row.append(0)
+    row.append("0.000")
 
 # Step 4: Write the updated rows
 with open('new_data.csv', 'w', newline='') as file:
